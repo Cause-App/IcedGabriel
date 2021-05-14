@@ -1,2 +1,2 @@
-**/e2e
+frontend/e2e
 *.spec.ts
