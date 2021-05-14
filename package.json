@@ -1,0 +1,25 @@
+{
+  "name": "codesnake",
+  "description": "",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "build": "cd frontend && ng build --prod && cd ..",
+    "serve": "cd frontend && ng serve && cd ..",
+    "heroku-postbuild": "cd frontend && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cause-App/CodeSnake.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Cause-App/CodeSnake/issues"
+  },
+  "homepage": "https://github.com/Cause-App/CodeSnake#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
