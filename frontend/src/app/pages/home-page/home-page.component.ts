@@ -25,8 +25,9 @@ export class HomePageComponent {
 }
   `;
 
-  submit(): void {
-    this.http.get(`/api/submitsnake?code=${encodeURIComponent(this.code)}`).toPromise();
+  async submit(): Promise<void> {
+    const response = await this.http.get(`/api/submitsnake?code=${encodeURIComponent(this.code)}`).toPromise();
+    console.log(response);
   }
 
 }

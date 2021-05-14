@@ -1,9 +1,9 @@
 public class Program {
 
     public static void main(String[] args) {
-        Snake snake = new Snake();
+        Slitherable snake = new Snake();
 
-        System.out.println(snake.getName());
+        System.out.print(snake.getName());
     }
 
 }
