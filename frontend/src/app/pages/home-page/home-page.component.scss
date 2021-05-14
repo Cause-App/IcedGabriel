@@ -1,0 +1,23 @@
+:host {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    background-color: #440a67;
+    height: 100%;
+
+    * {
+        font-size: 2em;
+    }
+}
+
+textarea {
+    width: 90%;
+    height: 70vh;
+    margin: 50px 0;
+    background-color: #93329e;
+    color: #ffe3fe;
+    border: 0;
+    resize: none;
+    padding: 20px;
+}

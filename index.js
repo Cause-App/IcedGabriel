@@ -14,7 +14,15 @@ const forceHTTPS = (req, res, next) => {
 }
 
 app.enable('trust proxy');
-// app.use(forceHTTPS);
+app.use(forceHTTPS);
+
+
+app.get("/api/submitsnake", (req, res) => {
+    console.log("test");
+    console.log(req.query.code);
+    res.send("{}");
+})
+
 
 app.use((req, res, next) => {
     req.method = "GET";
