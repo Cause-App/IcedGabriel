@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
+import { OAuthService } from 'angular-oauth2-oidc';
 
 @Component({
   selector: 'app-home-page',
@@ -8,7 +9,7 @@ import { Component } from '@angular/core';
 })
 export class HomePageComponent {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private oauthService: OAuthService) { }
 
   code = `public class Snake implements Slitherable {
 
@@ -29,5 +30,22 @@ export class HomePageComponent {
     const response = await this.http.get(`/api/submitsnake?code=${encodeURIComponent(this.code)}`).toPromise();
     console.log(response);
   }
+
+  login() {
+    this.oauthService.initImplicitFlow();
+  }
+
+  logout() {
+    this.oauthService.logOut();
+  }
+
+  get givenName(): string | null {
+    const claims: any = this.oauthService.getIdentityClaims();
+    if (!claims) {
+      return null;
+    }
+    return (claims['name'] as string);
+  }
+
 
 }
