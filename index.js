@@ -6,6 +6,12 @@ const fse = require("fs-extra");
 const { exec } = require('child_process');
 const path = require("path");
 const app = express();
+const {OAuth2Client} = require('google-auth-library');
+
+
+const CLIENT_ID = "527633665148-g2dignt1vnbt5o5imcpkh5s80jinckcr.apps.googleusercontent.com";
+const client = new OAuth2Client(CLIENT_ID);
+
 
 const port = process.env.PORT || 8000;
 
@@ -23,8 +29,37 @@ const forceHTTPS = (req, res, next) => {
 app.enable('trust proxy');
 app.use(forceHTTPS);
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.get("/api/submitsnake", (req, res) => {
+const requireLogin = async (req, res, next) => {
+    if (!req.query?.token && !req.body?.token) {
+        res.sendStatus(401);
+        return;
+    }
+    const token = req.query.token || req.body.token;
+
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: CLIENT_ID
+        });
+
+        const payload = ticket.getPayload();
+        const domain = payload["hd"];
+        if (domain !== "cam.ac.uk") {
+            res.sendStatus(401);
+            return;
+        }
+        req.userid = payload["sub"];
+        next();
+    } catch (err) {
+        res.sendStatus(401);
+        return;
+    }
+};
+
+app.get("/api/submitsnake", requireLogin, (req, res) => {
     console.log("Snake submitted");
 
     if (!req.query.code) {

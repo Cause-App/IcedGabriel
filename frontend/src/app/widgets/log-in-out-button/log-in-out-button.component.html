@@ -1,0 +1,7 @@
+<div *ngIf="givenName">
+    Hi {{givenName}}!
+    <button (click)="logout()">Logout</button>
+</div>
+<div *ngIf="!givenName">
+    <button (click)="login()">Log in</button>
+</div>

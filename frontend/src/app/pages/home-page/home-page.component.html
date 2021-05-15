@@ -1,10 +1,4 @@
-<div *ngIf="givenName">
-    Hi {{givenName}}!
-    <button (click)="logout()">Logout</button>
-</div>
-<div *ngIf="!givenName">
-    <button (click)="login()">Log in</button>
-</div>
+<app-log-in-out-button></app-log-in-out-button>
 
 <textarea [(ngModel)]="code"></textarea>
 <button class="button1" (click)="submit()">Submit</button>
