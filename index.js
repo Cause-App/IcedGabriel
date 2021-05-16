@@ -12,6 +12,15 @@ const {OAuth2Client} = require('google-auth-library');
 const CLIENT_ID = "527633665148-g2dignt1vnbt5o5imcpkh5s80jinckcr.apps.googleusercontent.com";
 const client = new OAuth2Client(CLIENT_ID);
 
+const initialHeapSize = 1024 * 1024 * 2;
+// The default size is 2097152 (2MB). 
+// The value must be a multiple of, and greater than, 1024 bytes (1KB).
+
+const maxHeapSize = 1024 * 1024 * 64;
+// The default size is 67108864 (64MB). 
+// The value must be a multiple of, and greater than, 1024 bytes (1KB).
+
+const threadStackSize = 1024 * 512;
 
 const port = process.env.PORT || 8000;
 
@@ -31,6 +40,7 @@ app.use(forceHTTPS);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 
 const requireLogin = async (req, res, next) => {
     if (!req.query?.token && !req.body?.token) {
@@ -54,6 +64,7 @@ const requireLogin = async (req, res, next) => {
         req.userid = payload["sub"];
         next();
     } catch (err) {
+        console.log(err);
         res.sendStatus(401);
         return;
     }
@@ -103,7 +114,7 @@ app.get("/api/submitsnake", requireLogin, (req, res) => {
             return;
         }
         console.log("Compiled");
-        exec(`java -cp ${snakePath} Program`, (err, stdout, stderr) => {
+        exec(`java -Djava.security.manager -Djava.security.policy==./snake.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${snakePath} Program`, (err, stdout, stderr) => {
             if (err) {
                 console.log({err, part: "Execute"});
                 res.json({err, stdout, stderr});
