@@ -114,7 +114,7 @@ app.get("/api/submitsnake", requireLogin, (req, res) => {
             return;
         }
         console.log("Compiled");
-        exec(`java -Djava.security.manager -Djava.security.policy==./snake.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${snakePath} Program`, (err, stdout, stderr) => {
+        exec(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==./snake.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${snakePath} Program`, (err, stdout, stderr) => {
             if (err) {
                 console.log({err, part: "Execute"});
                 res.json({err, stdout, stderr});
