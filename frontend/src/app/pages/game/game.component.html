@@ -1,2 +1,12 @@
-<p *ngIf="!game">Loading game...</p>
-<p *ngIf="game">Playing game {{game.name}}</p>
+<as-split direction="horizontal" (dragEnd)="resized()" (gutterDblClick)="resized()" (transitionEnd)="resized()">
+    <as-split-area [size]="60">
+        <as-split direction="vertical" (dragEnd)="resized()" (gutterDblClick)="resized()" (transitionEnd)="resized()">
+            <as-split-area [size]="60">
+                <app-ide [game]="game" [resize]="resizeEmitter"></app-ide>
+            </as-split-area>
+            <as-split-area [size]="40">
+            </as-split-area>
+        </as-split>
+    </as-split-area>
+    <as-split-area [size]="40"></as-split-area>
+</as-split>

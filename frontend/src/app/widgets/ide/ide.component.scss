@@ -1,0 +1,41 @@
+$toolbar-height: 50px;
+
+.toolbar {
+    &,
+    .files {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        height: $toolbar-height;
+        overflow-x: auto;
+        width: 100%;
+    }
+    font-size: 0.5em;
+
+    > * {
+        user-select: none;
+    }
+
+    .new-file {
+        padding: 0 1em;
+        cursor: pointer;
+        transition: transform 0.5s ease;
+        &:hover {
+            transform: scale(1.5) rotate(360deg);
+        }
+    }
+
+    .file {
+        &.selected {
+            background-color: #141414;
+        }
+        &:hover:not(:active):not(.selected) {
+            background-color: #343434;
+        }
+    }
+}
+
+.editor {
+    width: 100%;
+    height: calc(100% - #{$toolbar-height});
+}

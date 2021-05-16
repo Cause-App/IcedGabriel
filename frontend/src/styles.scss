@@ -1,14 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 
-html, body {
+html,
+body {
     height: 100%;
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
     margin: 0;
     font-size: 2em;
     color: #e3fff8;
+}
+
+body, input[type="text"] {
+    font-family: "Roboto", sans-serif;
 }
 
 * {
@@ -19,7 +23,9 @@ body {
     }
 }
 
-button, input, textarea {
+button,
+input,
+textarea {
     font-size: 1em;
 }
 
@@ -53,7 +59,6 @@ button {
     border-radius: 0.2em;
 
     &:not(:disabled) {
-
         &:hover {
             background-color: #8ce6cf;
         }
@@ -73,5 +78,65 @@ button {
 
     img {
         height: 1.5em;
+    }
+}
+
+/* in-flight clone */
+.gu-mirror {
+    position: fixed !important;
+    margin: 0 !important;
+    z-index: 9999 !important;
+    opacity: 0.8;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+    filter: alpha(opacity=80);
+    pointer-events: none;
+    font-size: 0.5em;
+}
+/* high-performance display:none; helper */
+.gu-hide {
+    left: -9999px !important;
+}
+/* added to mirrorContainer (default = body) while dragging */
+.gu-unselectable {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+/* added to the source element while its mirror is dragged */
+.gu-transit {
+    opacity: 0.2;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+    filter: alpha(opacity=20);
+}
+
+$file-width: 5em;
+.file {
+    width: $file-width;
+    background-color: #242424;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3em;
+    border: 0.05em solid black;
+    cursor: pointer;
+
+    input {
+        text-align: center;
+        width: $file-width;
+
+        &:disabled {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 1em;
+            cursor: inherit;
+            display: inline-block;
+            text-overflow: ellipsis;
+            pointer-events: none;
+            margin: 0;
+            padding: 0;
+        }
     }
 }

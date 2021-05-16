@@ -1,10 +1,17 @@
-import { Component, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+
+export interface CodeFile {
+  filename: string;
+  code: string;
+  protected?: boolean;
+}
 
 export interface Game {
   name: string;
   id: string;
   available: boolean;
+  defaultCode?: CodeFile[];
 };
 
 @Injectable({
@@ -12,12 +19,27 @@ export interface Game {
 })
 export class GameListService {
 
-  private gamesByID: {[key: string]: Game} = {};
+  private gamesByID: { [key: string]: Game } = {};
 
   games: Game[] = [
-    {name: "Snake", id: "snake", available: true},
-    {name: "Uno", id: "uno", available: false},
-    {name: "Monopoly", id: "monopoly", available: false},
+    {
+      name: "Snake", id: "snake", available: true, defaultCode: [
+        {
+          filename: "Snake.java",
+          protected: true,
+          code:
+            `public class Snake implements Slitherable {
+  
+    public Direction move(int myHeadX, int myHeadY, int enemyHeadX, int enemyHeadY, int appleX, int appleY) {
+        return Direction.LEFT;
+    }
+  
+}`
+        }
+      ]
+    },
+    { name: "Uno", id: "uno", available: false },
+    { name: "Monopoly", id: "monopoly", available: false },
   ]
 
   constructor(private router: Router) {

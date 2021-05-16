@@ -11,6 +11,10 @@ import { HomePageComponent } from './pages/home-page/home-page.component';
 import { LogInOutButtonComponent } from './widgets/log-in-out-button/log-in-out-button.component';
 import { NavbarComponent } from './widgets/navbar/navbar.component';
 import { GameComponent } from './pages/game/game.component';
+import { AngularSplitModule } from 'angular-split';
+import { DragulaModule } from 'ng2-dragula';
+import { ContextMenuComponent } from './widgets/context-menu/context-menu.component';
+import { IdeComponent } from './widgets/ide/ide.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +22,9 @@ import { GameComponent } from './pages/game/game.component';
     HomePageComponent,
     LogInOutButtonComponent,
     NavbarComponent,
-    GameComponent
+    GameComponent,
+    ContextMenuComponent,
+    IdeComponent
   ],
   imports: [
     BrowserModule,
@@ -26,7 +32,9 @@ import { GameComponent } from './pages/game/game.component';
     FormsModule,
     HttpClientModule,
     OAuthModule.forRoot(),
-    FontAwesomeModule
+    FontAwesomeModule,
+    AngularSplitModule,
+    DragulaModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]
