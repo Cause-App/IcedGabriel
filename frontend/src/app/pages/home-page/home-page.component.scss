@@ -5,6 +5,7 @@
     flex-direction: column;
     background-color: #21094e;
     height: 100%;
+    text-align: center;
 }
 
 h1 {
@@ -17,5 +18,54 @@ h1 {
     }
     img {
         height: 1em;
+    }
+}
+
+.games {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    color: black;
+
+    > button {
+        transition: transform 0.1s ease;
+        margin: 1em 0;
+        width: 100%;
+        display: block;
+
+        &:hover:not(:disabled) {
+            transform: scale(1.1);
+        }
+
+        &:disabled {
+            cursor: default;
+            position: relative;
+            transition: color 0.1s ease;
+
+            &:hover {
+                color: inherit;
+
+                &::after {
+                    transform: translateY(-200%);
+                }
+            }
+
+            &::after {
+                position: absolute;
+                pointer-events: none;
+                transition: transform 0.1s ease;
+                top: 50%;
+                left: -5em;
+                right: -5em;
+                text-align: center;
+                transform: translateY(-50%) rotate(-5deg);
+                z-index: 1;
+                width: auto;
+                content: "Coming soon!";
+                color: red;
+                font-weight: bold;
+            }
+        }
     }
 }

@@ -50,13 +50,17 @@ button {
     height: 1.8em;
     border: 0.01em solid black;
     background-color: #a9f1df;
+    border-radius: 0.2em;
 
-    &:hover {
-        background-color: #8ce6cf;
-    }
+    &:not(:disabled) {
 
-    &:active {
-        background-color: #6bcfb5;
+        &:hover {
+            background-color: #8ce6cf;
+        }
+
+        &:active {
+            background-color: #6bcfb5;
+        }
     }
 
     > *:not(:first-child) {

@@ -10,7 +10,7 @@ const authConfig: AuthConfig = {
   tokenEndpoint: "https://oauth2.googleapis.com/token",
   userinfoEndpoint: "https://openidconnect.googleapis.com/v1/userinfo",
   revocationEndpoint: "https://oauth2.googleapis.com/revoke",
-  requireHttps: false,
+  requireHttps: "remoteOnly"
 }
 
 @Component({

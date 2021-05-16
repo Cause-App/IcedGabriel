@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { UserDataService } from 'src/app/services/user-data.service';
 
@@ -9,7 +10,7 @@ import { UserDataService } from 'src/app/services/user-data.service';
 })
 export class LogInOutButtonComponent {
 
-  constructor(private oauthService: OAuthService, public user: UserDataService) {}
+  constructor(private oauthService: OAuthService, public user: UserDataService, private router: Router) {}
 
   login() {
     this.oauthService.initImplicitFlow();
@@ -17,6 +18,7 @@ export class LogInOutButtonComponent {
 
   logout() {
     this.oauthService.logOut();
+    this.router.navigate(["/"]);
   }
 
 }
