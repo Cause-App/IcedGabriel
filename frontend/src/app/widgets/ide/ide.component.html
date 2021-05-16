@@ -4,7 +4,7 @@
     </div>
     <div class="files" [dragula]="editingFilename === null ? 'DRAGULA_FILES' : ''">
         <div *ngFor="let file of codeFiles; let i = index" class="file" [title]="file.filename" (contextmenu)="displayContextMenu($event, i); false"
-            (click)="selectedSession=editingFilename === i ? selectedSession : i" (dblclick)="editingFilename=i;" (blur)="editingFilename=null" [ngClass]="{selected: i===selectedSession}">
+            (click)="selectedSession=editingFilename === i ? selectedSession : i" (dblclick)="editingFilename=file.protected ? null : i;" (blur)="editingFilename=null" [ngClass]="{selected: i===selectedSession}">
             <input #filenameinput type="text" [disabled]="editingFilename!==i" (change)="updateLanguage(i, $event)" (blur)="editingFilename=null" placeholder="filename" [value]="file.filename">
         </div>
     </div>
