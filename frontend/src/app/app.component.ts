@@ -19,7 +19,7 @@ const authConfig: AuthConfig = {
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'CodeSnake';
+  title = 'IcedGabriel';
 
   constructor(private oauthService: OAuthService) {
     this.oauthService.configure(authConfig);
