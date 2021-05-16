@@ -3,21 +3,19 @@
     align-items: center;
     justify-content: flex-start;
     flex-direction: column;
-    background-color: #440a67;
+    background-color: #21094e;
     height: 100%;
-
-    * {
-        font-size: 2em;
-    }
 }
 
-textarea {
-    width: 90%;
-    height: 70vh;
-    margin: 50px 0;
-    background-color: #93329e;
-    color: #ffe3fe;
-    border: 0;
-    resize: none;
-    padding: 20px;
+h1 {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    > * {
+        margin: 0.15em 0;
+    }
+    img {
+        height: 1em;
+    }
 }

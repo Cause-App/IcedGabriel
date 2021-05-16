@@ -1,0 +1,13 @@
+$navbar-height: min(2em, 6vh);
+
+.content {
+    height: 100vh;
+
+    app-navbar {
+        height: $navbar-height;
+    }
+
+    .router {
+        height: calc(100vh - #{$navbar-height});
+    }
+}

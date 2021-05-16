@@ -9,12 +9,14 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomePageComponent } from './pages/home-page/home-page.component';
 import { LogInOutButtonComponent } from './widgets/log-in-out-button/log-in-out-button.component';
+import { NavbarComponent } from './widgets/navbar/navbar.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomePageComponent,
-    LogInOutButtonComponent
+    LogInOutButtonComponent,
+    NavbarComponent
   ],
   imports: [
     BrowserModule,

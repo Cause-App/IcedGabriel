@@ -1,6 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
 html, body {
     height: 100%;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
     margin: 0;
+    font-size: 2em;
+    color: #e3fff8;
 }
 
 * {
@@ -11,14 +19,18 @@ html, body {
     }
 }
 
+button, input, textarea {
+    font-size: 1em;
+}
+
 button {
     cursor: pointer;
 }
 
 .button1 {
-    border: 1px solid black;
-    padding: 10px 30px;
-    border-radius: 20px;
+    border: 0.03em solid black;
+    padding: 0.1em 0.3em;
+    border-radius: 0.3em;
     background-color: #b4aee8;
 
     &:hover {
@@ -27,5 +39,35 @@ button {
 
     &:active {
         background-color: #726ca8;
+    }
+}
+
+.button2 {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 0.5em;
+    height: 1.8em;
+    border: 0.01em solid black;
+    background-color: #a9f1df;
+
+    &:hover {
+        background-color: #8ce6cf;
+    }
+
+    &:active {
+        background-color: #6bcfb5;
+    }
+
+    > *:not(:first-child) {
+        margin-left: 0.5em;
+    }
+
+    > *:not(:last-child) {
+        margin-right: 0.5em;
+    }
+
+    img {
+        height: 1.5em;
     }
 }

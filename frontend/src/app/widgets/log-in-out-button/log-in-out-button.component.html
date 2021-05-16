@@ -1,7 +1,16 @@
-<div *ngIf="givenName">
-    Hi {{givenName}}!
-    <button (click)="logout()">Logout</button>
+<div *ngIf="user.loggedIn">
+    <button class="button2" (click)="logout()">
+        <img [src]="user.picture">
+        <span>
+            Log out
+        </span>
+    </button>
 </div>
-<div *ngIf="!givenName">
-    <button (click)="login()">Log in</button>
+<div *ngIf="!user.loggedIn">
+    <button class="button2" (click)="login()">
+        <img src="https://raven.cam.ac.uk/images/raven-logo-small.gif">
+        <span>
+            Log in
+        </span>
+    </button>
 </div>

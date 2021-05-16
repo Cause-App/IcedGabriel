@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { OAuthService } from 'angular-oauth2-oidc';
+import { UserDataService } from 'src/app/services/user-data.service';
 
 @Component({
   selector: 'app-log-in-out-button',
@@ -8,7 +9,7 @@ import { OAuthService } from 'angular-oauth2-oidc';
 })
 export class LogInOutButtonComponent {
 
-  constructor(private oauthService: OAuthService) {}
+  constructor(private oauthService: OAuthService, public user: UserDataService) {}
 
   login() {
     this.oauthService.initImplicitFlow();
@@ -17,14 +18,5 @@ export class LogInOutButtonComponent {
   logout() {
     this.oauthService.logOut();
   }
-
-  get givenName(): string | null {
-    const claims: any = this.oauthService.getIdentityClaims();
-    if (!claims) {
-      return null;
-    }
-    return (claims['name'] as string);
-  }
-
 
 }
