@@ -72,11 +72,11 @@ router.post("/editsnake", requireLogin, (req, res) => {
     const sanitizedFiles = [];
     for (const file of req.body.code) {
         const {filename, code, protected} = file;
-        if (!filename || !code) {
+        if (!filename) {
             res.json({err: "Failed to update snake. Code file malformed"});
             return;
         }
-        sanitizedFiles.push({filename, code, protected});
+        sanitizedFiles.push({filename, code: code || "", protected});
     }
 
     if (id) {
