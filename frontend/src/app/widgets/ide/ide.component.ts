@@ -5,7 +5,7 @@ import 'ace-builds/src-noconflict/ext-language_tools';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { ContextMenuItem } from 'src/app/widgets/context-menu/context-menu.component';
 
-const languageOfExtension: {[key: string]: string} = {
+const languageOfExtension: { [key: string]: string } = {
   "java": "java",
   "js": "javascript",
   "html": "html",
@@ -16,9 +16,13 @@ const languageOfExtension: {[key: string]: string} = {
 
 const languageFromFilename = (filename: string): string => {
   const parts = filename.split(".");
-  const ext = (parts.length === 1 ? "": parts.pop()) ?? "";
+  const ext = (parts.length === 1 ? "" : parts.pop()) ?? "";
   return languageOfExtension[ext] ?? "text";
 }
+
+const allowedCharsInFilenames = "ABCDEFGHIJKLMNOPQSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&'()+,-;=@[]^_`{}~. ";
+const notAllowedAtEndOfFilename = ". ";
+const notAllowedAtStartOfFilename = " ";
 
 @Component({
   selector: 'app-ide',
@@ -31,6 +35,7 @@ export class IdeComponent implements OnInit, AfterViewInit {
   @Input() resize?: EventEmitter<void>;
   private aceEditor?: ace.Ace.Editor;
   public codeFiles: CodeFile[] = [];
+  public defaultCodeFiles: CodeFile[] = [];
   private editSessions: ace.Ace.EditSession[] = [];
   public displayingContextMenu: boolean = false;
   private contextMenuX: number = -1;
@@ -76,14 +81,55 @@ export class IdeComponent implements OnInit, AfterViewInit {
     const session = this.makeSession();
     this.editSessions.push(session);
     this.codeFiles.push({
-      filename: "New file.txt",
+      filename: this.incrementDuplicateFilenames("New file.txt"),
       code: ""
     })
     this.selectedSession = this.editSessions.length - 1;
   }
 
+  private filenameExists(filename: string): boolean {
+    for (const codeFile of this.codeFiles) {
+      if (codeFile.filename === filename) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private incrementDuplicateFilenames(filename: string): string {
+    let counter = 0;
+    let test = filename;
+    const parts = filename.split(".");
+    const ext = (parts.length === 1 ? "" : "." + parts.pop()) ?? "";
+    while (this.filenameExists(test)) {
+      counter++;
+      test = `${parts.join(".")} (${counter})${ext}`;
+    }
+    return test;
+  }
+
   updateLanguage(i: number, event: Event) {
-    this.editSessions[i].setMode(`ace/mode/${languageFromFilename((event.target as HTMLInputElement).value)}`);
+    const target = (event.target as HTMLInputElement);
+    const filename = target.value;
+    let sanitizedFilename = "";
+    for (const c of filename) {
+      if (allowedCharsInFilenames.includes(c)) {
+        sanitizedFilename += c;
+      }
+    }
+    while (sanitizedFilename.length && notAllowedAtEndOfFilename.includes(sanitizedFilename.charAt(sanitizedFilename.length - 1))) {
+      sanitizedFilename = sanitizedFilename.substring(0, sanitizedFilename.length - 1);
+    }
+    while (sanitizedFilename.length && notAllowedAtStartOfFilename.includes(sanitizedFilename.charAt(0))) {
+      sanitizedFilename = sanitizedFilename.substring(1, sanitizedFilename.length);
+    }
+
+    if (sanitizedFilename.length === 0) {
+      sanitizedFilename = "file";
+    }
+    target.value = this.incrementDuplicateFilenames(sanitizedFilename);
+    this.codeFiles[i].filename = target.value;
+    this.editSessions[i].setMode(`ace/mode/${languageFromFilename(target.value)}`);
   }
 
   @ViewChild("editor") private editor?: ElementRef;
@@ -95,8 +141,9 @@ export class IdeComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.codeFiles = this.game?.defaultCode || [];
+    this.defaultCodeFiles = this.game?.defaultCode || [];
     this.resize?.subscribe(() => {
-        this.aceEditor?.resize();
+      this.aceEditor?.resize();
     })
   }
 
@@ -148,8 +195,8 @@ export class IdeComponent implements OnInit, AfterViewInit {
       this.contextMenuItems.push({
         text: "Reset to default",
         click: () => {
-          this.editSessions[i].setValue(this.codeFiles[i].code);
-          this.editSessions[i].setMode(`ace/mode/${languageFromFilename(this.codeFiles[i].filename)}`);
+          this.editSessions[i].setValue(this.defaultCodeFiles[i].code);
+          this.editSessions[i].setMode(`ace/mode/${languageFromFilename(this.defaultCodeFiles[i].filename)}`);
           this.displayingContextMenu = false;
         }
       });
