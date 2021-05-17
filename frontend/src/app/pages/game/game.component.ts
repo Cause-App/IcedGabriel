@@ -12,6 +12,8 @@ export class GameComponent implements OnInit, AfterViewInit {
   public game?: Game;
   public resizeEmitter: EventEmitter<void> = new EventEmitter<void>();
 
+  codeChanged: EventEmitter<void> = new EventEmitter<void>();
+
   constructor(private route: ActivatedRoute, public gameList: GameListService, private router: Router, private resolver: ComponentFactoryResolver) {
   }
 
@@ -46,6 +48,7 @@ export class GameComponent implements OnInit, AfterViewInit {
       const reference: any = this.optionsContainer.createComponent(factory);  
       reference.instance.getFiles = this.getFiles.bind(this); 
       reference.instance.onFilesLoaded = this.codeFilesLoaded.bind(this); 
+      reference.instance.onCodeChanged = this.codeChanged; 
     }
   }
 

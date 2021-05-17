@@ -2,5 +2,4 @@
     <option *ngFor="let snake of snakes" [value]="snake._id">{{snake.name}}</option>
     <option [value]="undefined">New Snake</option>
 </select>
-<input [(ngModel)]="snakeName" maxlength="32" type="text" placeholder="Snake Name" value="My Snake">
-<button (click)="save()" class="button1">Save</button>
+<input [(ngModel)]="snakeName" maxlength="32" type="text" placeholder="Snake Name" value="My Snake" (ngModelChange)="save()">

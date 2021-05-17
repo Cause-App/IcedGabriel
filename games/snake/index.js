@@ -37,8 +37,9 @@ router.get("/getsnakes", requireLogin, (req, res) => {
 router.post("/editsnake", requireLogin, (req, res) => {
     const snakeCollection = db.db.collection("snake");
 
-    const id = req.body.id;
-    const name = req.body.name || "An Unnamed Snake";
+    const id = req.body.id && req.body.id !== "undefined" ? req.body.id : undefined;
+
+    const name = req.body.name || "An unnamed snake";
 
     if (name.length > 32) {
         res.json({err: "Failed to update snake. Snake name too long"});

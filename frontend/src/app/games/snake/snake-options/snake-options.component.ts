@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { CodeFile, GameListService } from 'src/app/services/game-list.service';
 
@@ -7,6 +7,8 @@ export interface Snake {
   name: string;
   code: CodeFile[];
 }
+
+const DEFAULT_SNAKE_NAME = "Un unnamed snake";
 
 @Component({
   selector: 'app-snake-options',
@@ -20,30 +22,39 @@ export class SnakeOptionsComponent implements OnInit {
   snakes: Snake[] = [];
   private snakesById: {[key: string]: Snake} = {};
 
-  snakeName: string = "";
-  snakeID: string | undefined;
+  snakeName: string = DEFAULT_SNAKE_NAME;
+  snakeID: string | undefined | null;
 
   @Input() getFiles: () => CodeFile[] = () => {return []};
   @Input() onFilesLoaded: (files: CodeFile[]) => void = () => {};
+  @Input() onCodeChanged?: EventEmitter<void>;
 
   snakeUpdated(): void {
     if (this.snakeID && this.snakeID !== "undefined") {
       this.snakeName = this.snakesById[this.snakeID].name;
       this.onFilesLoaded(this.snakesById[this.snakeID].code);
     } else {
-      this.snakeName = "";
+      this.snakeName = DEFAULT_SNAKE_NAME;
       this.onFilesLoaded(this.gameList.gameWithID("snake")?.defaultCode ?? []);
     }
+    this.save();
   }
   
   async save(): Promise<void> {
+    if (!this.snakeName || this.snakeID === null) {
+      return;
+    }
     const code = this.getFiles();
-    console.log(code);
-    const response: any = await this.api.post("snake/editsnake", {id: this.snakeID, name: this.snakeName, code});
+    const snakeID = this.snakeID;
+    if (!this.snakeID || this.snakeID === "undefined") {
+      this.snakeID = null;
+    }
+    const response: any = await this.api.post("snake/editsnake", {id: snakeID, name: this.snakeName, code});
     if (response.err) {
       console.error(response.err);
       return;
     }
+    console.log(this.snakesById);
     if (response.id) {
       const newSnake: Snake = {
         _id: response.id,
@@ -51,10 +62,11 @@ export class SnakeOptionsComponent implements OnInit {
         code
       };
       this.snakes.push(newSnake);
+      this.snakesById[response.id] = newSnake;
       this.snakeID = response.id;
-    } else if (this.snakeID && this.snakesById[this.snakeID]) {
-      this.snakesById[this.snakeID].name = this.snakeName;
-      this.snakesById[this.snakeID].code = code;
+    } else if (snakeID && snakeID !== "undefined" && this.snakesById[snakeID]) {
+      this.snakesById[snakeID].name = this.snakeName;
+      this.snakesById[snakeID].code = code;
     }
   }
 
@@ -71,6 +83,9 @@ export class SnakeOptionsComponent implements OnInit {
     }
     this.snakeUpdated();
 
+    this.onCodeChanged?.subscribe(() => {
+      this.save();
+    });
   }
 
 }
