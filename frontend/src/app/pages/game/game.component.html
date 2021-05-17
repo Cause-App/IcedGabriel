@@ -2,9 +2,12 @@
     <as-split-area [size]="60">
         <as-split direction="vertical" (dragEnd)="resized()" (gutterDblClick)="resized()" (transitionEnd)="resized()">
             <as-split-area [size]="60">
-                <app-ide [game]="game" [resize]="resizeEmitter"></app-ide>
+                <app-ide (onFilesChange)="codeFiles=$event" [newCodeFiles]="loadedCodeFiles" [game]="game" [resize]="resizeEmitter"></app-ide>
             </as-split-area>
-            <as-split-area [size]="40">
+            <as-split-area [size]="20">
+                <template #optionsContainer></template>
+            </as-split-area>
+            <as-split-area [size]="20">
             </as-split-area>
         </as-split>
     </as-split-area>

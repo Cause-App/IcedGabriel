@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { SnakeOptionsComponent } from '../games/snake/snake-options/snake-options.component';
 
 export interface CodeFile {
   filename: string;
@@ -12,6 +13,7 @@ export interface Game {
   id: string;
   available: boolean;
   defaultCode?: CodeFile[];
+  optionsComponent?: any;
 };
 
 @Injectable({
@@ -23,7 +25,7 @@ export class GameListService {
 
   games: Game[] = [
     {
-      name: "Snake", id: "snake", available: true, defaultCode: [
+      name: "Snake", id: "snake", available: true, optionsComponent: SnakeOptionsComponent, defaultCode: [
         {
           filename: "Snake.java",
           protected: true,

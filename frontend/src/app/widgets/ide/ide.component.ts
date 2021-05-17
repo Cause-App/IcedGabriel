@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CodeFile, Game } from 'src/app/services/game-list.service';
 import * as ace from "ace-builds";
 import 'ace-builds/src-noconflict/ext-language_tools';
@@ -34,13 +34,16 @@ export class IdeComponent implements OnInit, AfterViewInit {
   @Input() game?: Game;
   @Input() resize?: EventEmitter<void>;
   private aceEditor?: ace.Ace.Editor;
-  public codeFiles: CodeFile[] = [];
+  codeFiles: CodeFile[] = [];
+  @Input() newCodeFiles?: EventEmitter<CodeFile[]>;
   public defaultCodeFiles: CodeFile[] = [];
   private editSessions: ace.Ace.EditSession[] = [];
   public displayingContextMenu: boolean = false;
   private contextMenuX: number = -1;
   private contextMenuY: number = -1;
   public contextMenuItems: ContextMenuItem[] = [];
+
+  @Output() onFilesChange: EventEmitter<CodeFile[]> = new EventEmitter<CodeFile[]>();
 
   public _editingFilename: number | null = null;
 
@@ -55,7 +58,6 @@ export class IdeComponent implements OnInit, AfterViewInit {
     }
   }
 
-
   faPlus = faPlus;
 
   private _selectedSession: number = 0;
@@ -65,7 +67,7 @@ export class IdeComponent implements OnInit, AfterViewInit {
   }
 
   public set selectedSession(x: number) {
-    this._selectedSession = Math.min(Math.max(0, Math.floor(x)), this.editSessions.length - 1);
+    this._selectedSession = Math.max(0, Math.min(Math.floor(x), this.editSessions.length - 1));
     if (this.aceEditor) {
       this.aceEditor.setSession(this.editSessions[this._selectedSession]);
     }
@@ -78,6 +80,9 @@ export class IdeComponent implements OnInit, AfterViewInit {
   }
 
   newFile(): void {
+    if (this.codeFiles.length >= 16) {
+      return;
+    }
     const session = this.makeSession();
     this.editSessions.push(session);
     this.codeFiles.push({
@@ -85,6 +90,7 @@ export class IdeComponent implements OnInit, AfterViewInit {
       code: ""
     })
     this.selectedSession = this.editSessions.length - 1;
+    this.onFilesChange.emit(this.codeFiles);
   }
 
   private filenameExists(filename: string): boolean {
@@ -130,27 +136,33 @@ export class IdeComponent implements OnInit, AfterViewInit {
     target.value = this.incrementDuplicateFilenames(sanitizedFilename);
     this.codeFiles[i].filename = target.value;
     this.editSessions[i].setMode(`ace/mode/${languageFromFilename(target.value)}`);
+    this.onFilesChange.emit(this.codeFiles);
   }
 
   @ViewChild("editor") private editor?: ElementRef;
   @ViewChildren('filenameinput') filenameInputs?: QueryList<ElementRef>
 
-
-
   constructor() { }
 
   ngOnInit(): void {
-    this.codeFiles = this.game?.defaultCode || [];
     this.defaultCodeFiles = this.game?.defaultCode || [];
     this.resize?.subscribe(() => {
       this.aceEditor?.resize();
-    })
+    });
+    this.newCodeFiles?.subscribe((files: CodeFile[]) => {
+      this.codeFiles = files;
+      this.loadCodeFiles();
+    });
   }
 
-  ngAfterViewInit(): void {
+  private loadCodeFiles() {
     if (this.editor) {
-      ace.config.set("basePath", "https://unpkg.com/ace-builds@1.4.12/src-noconflict");
-      ace.config.set("fontSize", "0.7em");
+      this.aceEditor?.destroy();
+      this.editor.nativeElement.innerHTML = "";
+      this.editSessions = [];
+      this._editingFilename = null;
+      this.displayingContextMenu = false;
+      this.selectedSession = 0;
       this.aceEditor = ace.edit(this.editor.nativeElement);
       for (const codeFile of this.codeFiles) {
         const session = this.makeSession(codeFile.code);
@@ -185,6 +197,24 @@ export class IdeComponent implements OnInit, AfterViewInit {
           editor.session.getUndoManager().redo(editor.session);
         }
       });
+
+      this.aceEditor.on("change", () => {
+        if (!this.aceEditor) {
+          return;
+        }
+        this.codeFiles[this.selectedSession].code = this.aceEditor.getValue();
+        this.onFilesChange.emit(this.codeFiles);
+      });
+    }
+
+    this.onFilesChange.emit(this.codeFiles);
+  }
+
+  ngAfterViewInit(): void {
+    if (this.editor) {
+      ace.config.set("basePath", "https://unpkg.com/ace-builds@1.4.12/src-noconflict");
+      ace.config.set("fontSize", "0.7em");
+      this.loadCodeFiles();
     }
   }
 
@@ -198,6 +228,7 @@ export class IdeComponent implements OnInit, AfterViewInit {
           this.editSessions[i].setValue(this.defaultCodeFiles[i].code);
           this.editSessions[i].setMode(`ace/mode/${languageFromFilename(this.defaultCodeFiles[i].filename)}`);
           this.displayingContextMenu = false;
+          this.onFilesChange.emit(this.codeFiles);
         }
       });
     } else {
@@ -217,6 +248,7 @@ export class IdeComponent implements OnInit, AfterViewInit {
             this.selectedSession--;
           }
           this.displayingContextMenu = false;
+          this.onFilesChange.emit(this.codeFiles);
         }
       });
     }

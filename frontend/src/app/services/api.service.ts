@@ -18,4 +18,9 @@ export class ApiService {
     const url = `/api/${endpoint}?${args}token=${this.oauthService.getIdToken()}`;
     return this.http.get(url).toPromise();
   }
+
+  public post(endpoint: string, params: any): Promise<object> {
+    const url = `/api/${endpoint}`;
+    return this.http.post(url, {...params, token: this.oauthService.getIdToken()}).toPromise();
+  }
 }

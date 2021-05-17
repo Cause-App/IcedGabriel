@@ -15,6 +15,7 @@ import { AngularSplitModule } from 'angular-split';
 import { DragulaModule } from 'ng2-dragula';
 import { ContextMenuComponent } from './widgets/context-menu/context-menu.component';
 import { IdeComponent } from './widgets/ide/ide.component';
+import { SnakeOptionsComponent } from './games/snake/snake-options/snake-options.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { IdeComponent } from './widgets/ide/ide.component';
     NavbarComponent,
     GameComponent,
     ContextMenuComponent,
-    IdeComponent
+    IdeComponent,
+    SnakeOptionsComponent
   ],
   imports: [
     BrowserModule,
