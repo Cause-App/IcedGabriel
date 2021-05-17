@@ -27,14 +27,10 @@ export class SnakeOptionsComponent implements OnInit {
   @Input() onFilesLoaded: (files: CodeFile[]) => void = () => {};
 
   snakeUpdated(): void {
-    console.log(this.snakeID);
-    console.log(this.snakesById);
     if (this.snakeID && this.snakeID !== "undefined") {
-      console.log("A");
       this.snakeName = this.snakesById[this.snakeID].name;
       this.onFilesLoaded(this.snakesById[this.snakeID].code);
     } else {
-      console.log("B");
       this.snakeName = "";
       this.onFilesLoaded(this.gameList.gameWithID("snake")?.defaultCode ?? []);
     }
