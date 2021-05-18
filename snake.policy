@@ -1,7 +1,4 @@
-
 grant {
-        // "standard" properies that can be read by anyone
-
         permission java.util.PropertyPermission "java.vendor", "read";
         permission java.util.PropertyPermission "java.vendor.url", "read";
         permission java.util.PropertyPermission "java.class.version", "read";
