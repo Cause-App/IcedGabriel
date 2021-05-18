@@ -1,3 +1,5 @@
+package logic;
+
 public interface Slitherable {
 
     enum Direction {
@@ -8,7 +10,5 @@ public interface Slitherable {
     }
 
   public Direction move(int myHeadX, int myHeadY, int enemyHeadX, int enemyHeadY, int appleX, int appleY);
-
-  public String getName();
   
 }

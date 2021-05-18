@@ -1,11 +1,15 @@
 import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
+import { WarningsService } from 'src/app/services/warnings.service';
 import { CodeFile, GameListService } from 'src/app/services/game-list.service';
+import { UserDataService } from 'src/app/services/user-data.service';
 
 export interface Snake {
   _id: string;
   name: string;
   code: CodeFile[];
+  owner?: string;
+  ownerName?: string;
 }
 
 const DEFAULT_SNAKE_NAME = "Un unnamed snake";
@@ -17,7 +21,7 @@ const DEFAULT_SNAKE_NAME = "Un unnamed snake";
 })
 export class SnakeOptionsComponent implements OnInit {
 
-  constructor(private api: ApiService, private gameList: GameListService) { }
+  constructor(private api: ApiService, private gameList: GameListService, private warnings: WarningsService, private user: UserDataService) { }
 
   snakes: Snake[] = [];
   private snakesById: {[key: string]: Snake} = {};
@@ -29,6 +33,7 @@ export class SnakeOptionsComponent implements OnInit {
 
   @Input() getFiles: () => CodeFile[] = () => {return []};
   @Input() onFilesLoaded: (files: CodeFile[]) => void = () => {};
+  @Input() onIdChanged: (id: string | undefined | null) => void = () => {};
   @Input() onCodeChanged?: EventEmitter<void>;
 
   snakeUpdated(): void {
@@ -40,6 +45,7 @@ export class SnakeOptionsComponent implements OnInit {
       this.onFilesLoaded(this.gameList.gameWithID("snake")?.defaultCode ?? []);
     }
     this.save();
+    this.onIdChanged(this.snakeID);
   }
   
   async save(): Promise<void> {
@@ -51,16 +57,25 @@ export class SnakeOptionsComponent implements OnInit {
     if (!this.snakeID || this.snakeID === "undefined") {
       this.snakeID = null;
     }
-    const response: any = await this.api.post("snake/editsnake", {id: snakeID, name: this.snakeName, code});
+    let response: any;
+    try {
+      response = await this.api.post("snake/editsnake", {id: snakeID, name: this.snakeName, code});
+    } catch {
+      response = {err: "Could not connect to server"};
+    }
     if (response.err) {
+      this.warnings.setWarning("unsavedChanges", true);
       console.error(response.err);
       return;
     }
+    this.warnings.setWarning("unsavedChanges", false);
     if (response.id) {
       const newSnake: Snake = {
         _id: response.id,
         name: this.snakeName,
-        code
+        code,
+        owner: this.user.sub,
+        ownerName: this.user.name
       };
       this.snakes.push(newSnake);
       this.snakesById[response.id] = newSnake;
@@ -83,6 +98,7 @@ export class SnakeOptionsComponent implements OnInit {
       this.snakeID = undefined;
     }
     this.snakeUpdated();
+    this.onIdChanged(this.snakeID);
 
     this.onCodeChanged?.subscribe(() => {
       this.save();

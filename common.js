@@ -27,6 +27,7 @@ const requireLogin = async (req, res, next) => {
             return;
         }
         req.userid = payload["sub"];
+        req.name = payload["name"];
         next();
     } catch (err) {
         console.log(err);

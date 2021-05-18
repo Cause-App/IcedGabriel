@@ -2,6 +2,7 @@
 
 const express = require("express");
 const app = express();
+const fs = require("fs");
 require("dotenv").config();
 
 const port = process.env.PORT || 8000;
@@ -38,6 +39,12 @@ app.get('*.*', express.static(_app_folder, { maxAge: '1y' }));
 app.all('*', function (req, res) {
     res.status(200).sendFile(`/`, { root: _app_folder });
 });
+
+if (fs.existsSync("./RunningGames")){
+    fs.rmSync("./RunningGames", { recursive: true, force: true });
+}
+
+fs.mkdirSync("./RunningGames");
 
 db.client.connect(function(err) {
     if (err) {

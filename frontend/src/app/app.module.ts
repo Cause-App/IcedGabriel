@@ -16,6 +16,8 @@ import { DragulaModule } from 'ng2-dragula';
 import { ContextMenuComponent } from './widgets/context-menu/context-menu.component';
 import { IdeComponent } from './widgets/ide/ide.component';
 import { SnakeOptionsComponent } from './games/snake/snake-options/snake-options.component';
+import { WarningsComponent } from './widgets/warnings/warnings.component';
+import { SnakePlayerComponent } from './games/snake/snake-player/snake-player.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +28,9 @@ import { SnakeOptionsComponent } from './games/snake/snake-options/snake-options
     GameComponent,
     ContextMenuComponent,
     IdeComponent,
-    SnakeOptionsComponent
+    SnakeOptionsComponent,
+    WarningsComponent,
+    SnakePlayerComponent
   ],
   imports: [
     BrowserModule,

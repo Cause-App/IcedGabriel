@@ -17,9 +17,11 @@ export class GameComponent implements OnInit, AfterViewInit {
   constructor(private route: ActivatedRoute, public gameList: GameListService, private router: Router, private resolver: ComponentFactoryResolver) {
   }
 
-  @ViewChild("optionsContainer", {read: ViewContainerRef}) optionsContainer?: ViewContainerRef;
+  @ViewChild("optionsContainer", { read: ViewContainerRef }) optionsContainer?: ViewContainerRef;
+  @ViewChild("playerContainer", { read: ViewContainerRef }) playerContainer?: ViewContainerRef;
 
   loadedCodeFiles: EventEmitter<CodeFile[]> = new EventEmitter<CodeFile[]>();
+  playerIdChanged: EventEmitter<void> = new EventEmitter<void>();
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -37,18 +39,38 @@ export class GameComponent implements OnInit, AfterViewInit {
     return this.codeFiles;
   }
 
+  playerId: string | undefined | null = "";
+  getPlayerId(): string | undefined | null {
+    return this.playerId;
+  }
+
+  onPlayerIdChange(id: string | undefined | null): void {
+    this.playerId = id;
+    this.playerIdChanged.emit();
+  }
+
   codeFilesLoaded(files: CodeFile[]) {
     this.loadedCodeFiles.emit(files);
   }
 
   ngAfterViewInit(): void {
-    if (this.game && this.optionsContainer) {
-      this.optionsContainer.clear(); 
-      const factory = this.resolver.resolveComponentFactory(this.game.optionsComponent);
-      const reference: any = this.optionsContainer.createComponent(factory);  
-      reference.instance.getFiles = this.getFiles.bind(this); 
-      reference.instance.onFilesLoaded = this.codeFilesLoaded.bind(this); 
-      reference.instance.onCodeChanged = this.codeChanged; 
+    if (this.game) {
+      if (this.optionsContainer) {
+        this.optionsContainer.clear();
+        const factory = this.resolver.resolveComponentFactory(this.game.optionsComponent);
+        const reference: any = this.optionsContainer.createComponent(factory);
+        reference.instance.getFiles = this.getFiles.bind(this);
+        reference.instance.onFilesLoaded = this.codeFilesLoaded.bind(this);
+        reference.instance.onCodeChanged = this.codeChanged;
+        reference.instance.onIdChanged = this.onPlayerIdChange.bind(this);
+      }
+      if (this.playerContainer) {
+        this.playerContainer.clear();
+        const factory = this.resolver.resolveComponentFactory(this.game.playerComponent);
+        const reference: any = this.playerContainer.createComponent(factory);
+        reference.instance.getPlayerId = this.getPlayerId.bind(this);
+        reference.instance.playerIdChanged = this.playerIdChanged;
+      }
     }
   }
 

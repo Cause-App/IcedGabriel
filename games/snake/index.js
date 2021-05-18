@@ -15,16 +15,47 @@ const maxHeapSize = 1024 * 1024 * 64;
 // The value must be a multiple of, and greater than, 1024 bytes (1KB).
 
 const threadStackSize = 1024 * 512;
-const snakeTemplatePath = "./SnakeJava";
-const snakePath = "./SnakeJava0";
+const snakeCodePath = "./GameCode/Snake";
+const runningGamesPath = "./RunningGames";
 
+const MAX_GAMES = 5;
 
 const router = express.Router();
+
+const filenameValid = (filename) => {
+    // TODO validate filename
+    return true;
+}
+
+const runCommand = (command) => {
+    return new Promise((resolve, reject) => {
+        exec(command, (err, stdout, stderr) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({stdout, stderr});
+            }
+        });
+    });
+}
 
 router.get("/getsnakes", requireLogin, (req, res) => {
     const snakeCollection = db.db.collection("snake");
 
-    snakeCollection.find({owner: req.userid}).toArray((err, docs) => {
+    snakeCollection.find({ owner: req.userid }).toArray((err, docs) => {
+        if (err) {
+            console.err(err);
+            res.json([]);
+            return;
+        }
+        res.json(docs);
+    });
+});
+
+router.get("/getallsnakes", requireLogin, (req, res) => {
+    const snakeCollection = db.db.collection("snake");
+
+    snakeCollection.find().toArray((err, docs) => {
         if (err) {
             console.err(err);
             res.json([]);
@@ -42,41 +73,45 @@ router.post("/editsnake", requireLogin, (req, res) => {
     const name = req.body.name || "An unnamed snake";
 
     if (name.length > 32) {
-        res.json({err: "Failed to update snake. Snake name too long"});
+        res.json({ err: "Failed to update snake. Snake name too long" });
         return;
     }
 
     if (id && id.length > 32) {
-        res.json({err: "Failed to update snake. Snake id too long"});
+        res.json({ err: "Failed to update snake. Snake id too long" });
         return;
     }
 
     if (!req.body.code) {
-        res.json({err: "Failed to update snake. Code files were not uploaded properly"});
+        res.json({ err: "Failed to update snake. Code files were not uploaded properly" });
         return;
     }
 
     if (JSON.stringify(req.body.code).length > 1024 * 1024) {
-        res.json({err: "Failed to update snake. Code files too big"});
+        res.json({ err: "Failed to update snake. Code files too big" });
     }
 
     if (!Array.isArray(req.body.code)) {
-        res.json({err: "Failed to update snake. Code files were not uploaded properly"});
+        res.json({ err: "Failed to update snake. Code files were not uploaded properly" });
         return;
     }
 
     if (req.body.code.length > 16) {
-        res.json({err: "Failed to update snake. Too many code files"});
+        res.json({ err: "Failed to update snake. Too many code files" });
     }
 
     const sanitizedFiles = [];
     for (const file of req.body.code) {
-        const {filename, code, protected} = file;
+        const { filename, code, protected } = file;
         if (!filename) {
-            res.json({err: "Failed to update snake. Code file malformed"});
+            res.json({ err: "Failed to update snake. Code file malformed" });
             return;
         }
-        sanitizedFiles.push({filename, code: code || "", protected});
+        if (!filenameValid(filename)) {
+            res.json({ err: "Failed to update snake. File name invalid" });
+            return;
+        }
+        sanitizedFiles.push({ filename, code: code || "", protected });
     }
 
     if (id) {
@@ -94,7 +129,7 @@ router.post("/editsnake", requireLogin, (req, res) => {
             (err) => {
                 if (err) {
                     console.err(err);
-                    res.json({err});
+                    res.json({ err });
                     return;
                 }
                 res.json({});
@@ -103,6 +138,7 @@ router.post("/editsnake", requireLogin, (req, res) => {
     } else {
         const toInsert = {
             owner: req.userid,
+            ownerName: req.name,
             name: name,
             code: sanitizedFiles
         };
@@ -111,22 +147,84 @@ router.post("/editsnake", requireLogin, (req, res) => {
             (err) => {
                 if (err) {
                     console.err(err);
-                    res.json({err});
+                    res.json({ err });
                     return;
                 }
-                res.json({id: toInsert._id});
+                res.json({ id: toInsert._id });
             }
         )
     }
 })
 
-router.get("/submitsnake", requireLogin, (req, res) => {
-    console.log("Snake submitted");
+router.get("/play", requireLogin, async (req, res) => {
+    const snakeCollection = db.db.collection("snake");
 
-    if (!req.query.code) {
-        res.json({ err: "Code not provided" });
+    if (!req.query.myId || !req.query.opponentId) {
+        res.json({ err: "Snake IDs not provided" });
         return;
     }
+
+    const { myId, opponentId } = req.query;
+
+    const mySnake = await snakeCollection.findOne({ owner: req.userid, _id: mongo.ObjectId(myId) });
+    if (!mySnake) {
+        res.json({ err: "Your snake does not exist or you do not own it" });
+        return;
+    }
+
+    const opponentSnake = await snakeCollection.findOne({ _id: mongo.ObjectId(opponentId) });
+    if (!opponentSnake) {
+        res.json({ err: "Your opponent's snake does not exist" });
+        return;
+    }
+
+    let gamePath;
+    try {
+        const existing = fs.readdirSync(runningGamesPath).length;
+        if (existing >= MAX_GAMES) {
+            // TODO replace with a queue system
+            res.json( { err: "Too many games being played" } );
+            return;
+        }
+
+        gamePath = path.join(runningGamesPath, `Game${existing}`);
+    } catch (err) {
+        res.json({err: "Failed to read the running games directory"});
+        return;
+    }
+    try {
+
+        fse.copySync(snakeCodePath, gamePath);
+
+        const mySnakePath = path.join(gamePath, "snake1");
+        const opponentSnakePath = path.join(gamePath, "snake2");
+
+        for (const [snakePath, snakeCode, package] of [[mySnakePath, mySnake.code, "snake1"], [opponentSnakePath, opponentSnake.code, "snake2"]]) {
+            fs.mkdirSync(snakePath);
+
+            for (const { filename, code } of snakeCode) {
+                if (filenameValid(filename)) {
+                    fs.writeFileSync(path.join(snakePath, filename), `package ${package};\n${code}`);
+                }
+            }
+
+        }
+
+        await runCommand(`cd ${gamePath} && javac logic/Program.java`);
+
+        const output = await runCommand(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==./snake.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${gamePath} logic.Program`);
+
+        res.json({
+            output
+        });
+
+    } catch (err) {
+        res.json({ err });
+    } finally {
+        fs.rmSync(gamePath, { recursive: true, force: true });
+    }
+
+    return;
 
     // Copy ./SnakeJava to ./SnakeJavaCopy or wherever
     // Write req.query.code to ./SnakeJavaCopy/Snake.java

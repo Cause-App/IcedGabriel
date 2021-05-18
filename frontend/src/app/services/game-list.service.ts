@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { SnakeOptionsComponent } from '../games/snake/snake-options/snake-options.component';
+import { SnakePlayerComponent } from '../games/snake/snake-player/snake-player.component';
 
 export interface CodeFile {
   filename: string;
@@ -14,6 +15,7 @@ export interface Game {
   available: boolean;
   defaultCode?: CodeFile[];
   optionsComponent?: any;
+  playerComponent?: any;
 };
 
 @Injectable({
@@ -25,12 +27,15 @@ export class GameListService {
 
   games: Game[] = [
     {
-      name: "Snake", id: "snake", available: true, optionsComponent: SnakeOptionsComponent, defaultCode: [
+      name: "Snake", id: "snake", available: true, optionsComponent: SnakeOptionsComponent, playerComponent: SnakePlayerComponent, defaultCode: [
         {
           filename: "Snake.java",
           protected: true,
           code:
-            `public class Snake implements Slitherable {
+            `import logic.Slitherable;
+import logic.Slitherable.Direction;
+
+public class Snake implements Slitherable {
   
     public Direction move(int myHeadX, int myHeadY, int enemyHeadX, int enemyHeadY, int appleX, int appleY) {
         return Direction.LEFT;

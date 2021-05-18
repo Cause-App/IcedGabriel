@@ -1,0 +1,4 @@
+<div class="warning unsaved-changes" [ngClass]="{hidden: !warnings.includes('unsavedChanges'), depressed:depressed['unsavedChanges']}" (click)="depressed['unsavedChanges']=!depressed['unsavedChanges']">
+    <span>Your latest changes weren't able to be saved.</span>
+    <span>Once the problem is fixed this banner will disappear</span>
+</div>
