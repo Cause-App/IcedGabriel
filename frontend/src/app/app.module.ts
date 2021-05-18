@@ -18,6 +18,7 @@ import { IdeComponent } from './widgets/ide/ide.component';
 import { SnakeOptionsComponent } from './games/snake/snake-options/snake-options.component';
 import { WarningsComponent } from './widgets/warnings/warnings.component';
 import { SnakePlayerComponent } from './games/snake/snake-player/snake-player.component';
+import { SnakeGridComponent } from './games/snake/snake-player/snake-grid/snake-grid.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { SnakePlayerComponent } from './games/snake/snake-player/snake-player.co
     IdeComponent,
     SnakeOptionsComponent,
     WarningsComponent,
-    SnakePlayerComponent
+    SnakePlayerComponent,
+    SnakeGridComponent
   ],
   imports: [
     BrowserModule,

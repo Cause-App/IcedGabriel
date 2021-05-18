@@ -16,7 +16,9 @@ export class SnakePlayerComponent implements OnInit {
   @Input() getPlayerId: () => string | undefined | null = () => undefined;
   @Input() playerIdChanged?: EventEmitter<void>;
 
-  constructor(private api: ApiService) { 37}
+  public gameString: string = "";
+
+  constructor(private api: ApiService) { }
 
   async ngOnInit(): Promise<void> {
     const response: any = await this.api.get("snake/getAllSnakes", {});
@@ -30,8 +32,12 @@ export class SnakePlayerComponent implements OnInit {
   }
 
   async play() {
-    const response = await this.api.get("snake/play", {myId: this.myId, opponentId: this.opponentId});
-    console.log(response);
+    const response: any = await this.api.get("snake/play", { myId: this.myId, opponentId: this.opponentId });
+    if (response.err) {
+      console.error(response.err);
+    } else {
+      this.gameString = response.stdout;
+    }
   }
 
 }

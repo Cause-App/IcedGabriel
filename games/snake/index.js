@@ -214,9 +214,7 @@ router.get("/play", requireLogin, async (req, res) => {
 
         const output = await runCommand(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==./snake.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${gamePath} logic.Program`);
 
-        res.json({
-            output
-        });
+        res.json(output);
 
     } catch (err) {
         res.json({ err });
@@ -224,54 +222,6 @@ router.get("/play", requireLogin, async (req, res) => {
         fs.rmSync(gamePath, { recursive: true, force: true });
     }
 
-    return;
-
-    // Copy ./SnakeJava to ./SnakeJavaCopy or wherever
-    // Write req.query.code to ./SnakeJavaCopy/Snake.java
-    // Run javac SnakeJavaCopy/*
-    // Run java -cp ./SnakeJavaCopy Program
-
-    try {
-        fs.rmSync(snakePath, { recursive: true, force: true });
-        console.log("Removed");
-    } catch (err) {
-        console.log({ err, part: "Remove" });
-        res.json({ err });
-        return;
-    }
-    try {
-        fse.copySync(snakeTemplatePath, snakePath);
-    } catch (err) {
-        console.log({ err, part: "Copy" });
-        res.json({ err });
-        return;
-    }
-    console.log("Copied");
-    try {
-        fs.writeFileSync(path.join(snakePath, "Snake.java"), req.query.code);
-        console.log("Wrote");
-    } catch (err) {
-        console.log({ err, part: "Write" });
-        res.json({ err });
-        return;
-    }
-    exec(`javac ${path.join(snakePath, "*.java")}`, (err, stdout, stderr) => {
-        if (err) {
-            console.log({ err, part: "Compile" });
-            res.json({ err, stdout, stderr });
-            return;
-        }
-        console.log("Compiled");
-        exec(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==./snake.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${snakePath} Program`, (err, stdout, stderr) => {
-            if (err) {
-                console.log({ err, part: "Execute" });
-                res.json({ err, stdout, stderr });
-                return;
-            }
-            console.log("Executed");
-            res.json({ stdout, stderr });
-        });
-    });
 });
 
 module.exports = router;

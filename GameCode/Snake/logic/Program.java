@@ -8,10 +8,10 @@ import logic.Slitherable.Direction;
 
 public class Program {
 
-	private static final int GRID_WIDTH = 5;
-	private static final int GRID_HEIGHT = 5;
+	private static final int GRID_WIDTH = 16;
+	private static final int GRID_HEIGHT = 16;
 	private static final int SNAKE_MOVE_MAX_MILLIS = 200;
-	private static final int MAX_ROUNDS = 10;
+	private static final int MAX_ROUNDS = 1000;
 
 	private static class SnakeThread implements Runnable {
 		private final Game game;
@@ -72,7 +72,7 @@ public class Program {
 				ax = rng.nextInt(GRID_WIDTH);
 				ay = rng.nextInt(GRID_HEIGHT);
 			} while (grid.get(ax, ay) != Grid.Tile.EMPTY);
-			grid.set(ax, ax, Grid.Tile.APPLE);
+			grid.set(ax, ay, Grid.Tile.APPLE);
 		}
 
 		public Game() {
@@ -137,7 +137,7 @@ public class Program {
 		private final Tile[][] cells;
 
 		public Grid(int width, int height) {
-			cells = new Tile[width][height];
+			cells = new Tile[height][width];
 			for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
 					cells[y][x] = Tile.EMPTY;
@@ -207,7 +207,7 @@ public class Program {
 	private static Game game;
 
 	public static void main(String[] args) {
-		String log = "";
+		String log = ""+GRID_WIDTH+","+GRID_HEIGHT;
 		game = new Game();
 
 		ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -215,7 +215,7 @@ public class Program {
 		SnakeThread s1 = new SnakeThread(game, new snake1.Snake(), true);
 		SnakeThread s2 = new SnakeThread(game, new snake2.Snake(), false);
 
-		log += game.s1x+","+game.s1y+","+game.s2x+","+game.s2y+","+game.ax+","+game.ay;
+		log += ","+game.s1x+","+game.s1y+","+game.s2x+","+game.s2y+","+game.ax+","+game.ay;
 
 		boolean over;
 		int rounds = 0;
@@ -324,6 +324,10 @@ public class Program {
 					}
 				}
 			} while (!over & ++rounds < MAX_ROUNDS);
+
+			if (!over) {
+				log += ",-1,-1,0";
+			}
 
 			System.out.print(log);
 		} catch (Exception e) {

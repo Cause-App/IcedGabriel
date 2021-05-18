@@ -1,0 +1,50 @@
+:host {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+}
+
+.container {
+    margin-top: 1em;
+    display: inline-block;
+    width: 80%;
+    padding-top: 80%;
+    position: relative;
+}
+
+.grid {
+    display: grid;
+    grid-auto-flow: row;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.cell {
+    border-style: solid;
+    border-color: black;
+}
+
+.empty {
+    background-color: white;
+}
+
+.snake1 {
+    background-color: red;
+}
+
+.snake2 {
+    background-color: blue;
+}
+
+.apple {
+    background-color: lime;
+}
+
+.collision {
+    background-color: purple;
+}
