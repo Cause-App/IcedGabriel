@@ -22,6 +22,8 @@ export class SnakeOptionsComponent implements OnInit {
   snakes: Snake[] = [];
   private snakesById: {[key: string]: Snake} = {};
 
+  pickingOtherSnake = false;
+
   snakeName: string = DEFAULT_SNAKE_NAME;
   snakeID: string | undefined | null;
 
@@ -54,7 +56,6 @@ export class SnakeOptionsComponent implements OnInit {
       console.error(response.err);
       return;
     }
-    console.log(this.snakesById);
     if (response.id) {
       const newSnake: Snake = {
         _id: response.id,

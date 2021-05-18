@@ -198,6 +198,14 @@ export class IdeComponent implements OnInit, AfterViewInit {
         }
       });
 
+      this.aceEditor.commands.addCommand({
+        name: "save",
+        bindKey: { win: "Ctrl-S", mac: "Command-S" },
+        exec: (editor) => {
+          this.onFilesChange.emit(this.codeFiles);
+        }
+      });
+
       this.aceEditor.on("change", () => {
         if (!this.aceEditor) {
           return;

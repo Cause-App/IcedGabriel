@@ -23,6 +23,12 @@ body, input[type="text"] {
     }
 }
 
+input[type="text"] {
+    background-color: #616161;
+    color: white;
+    border: 0.1em solid #414141;
+}
+
 button,
 input,
 textarea,
