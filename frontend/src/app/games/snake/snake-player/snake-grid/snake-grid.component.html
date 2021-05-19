@@ -5,3 +5,5 @@
     <canvas #canvas [width]="width*cellWidth" [height]="height*cellHeight"></canvas>
 </div>
 <button *ngIf="playingGame && !cancelledGame" class="button1" (click)="cancelledGame=true">Cancel</button>
+<span class="winner" *ngIf="winner">{{winner}}</span>
+<span class="details" *ngIf="details">{{details}}</span>

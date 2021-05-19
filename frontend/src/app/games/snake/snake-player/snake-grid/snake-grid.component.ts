@@ -19,6 +19,9 @@ export class SnakeGridComponent implements OnInit, AfterViewInit {
   cellWidth: number = 32;
   cellHeight: number = 32;
 
+  winner: string = "";
+  details: string = "";
+
   @ViewChild("canvas") canvasRef?: ElementRef;
 
   private turnsPerSecond = 10;
@@ -33,7 +36,6 @@ export class SnakeGridComponent implements OnInit, AfterViewInit {
     const width = this.width*this.cellWidth;
     const height = this.height*this.cellHeight;
 
-    // ctx.translate(0.5,0.5);
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, width, height);
 
@@ -83,6 +85,8 @@ export class SnakeGridComponent implements OnInit, AfterViewInit {
       return;
     }
     try {
+      this.winner = "";
+      this.details = "";
       this.playingGame = true;
       this.cancelledGame = false;
       const parts: number[] = game.split(",").map(x => +x);
@@ -119,13 +123,13 @@ export class SnakeGridComponent implements OnInit, AfterViewInit {
           const d2 = parts[index++];
 
           if (d1 === -1 && d2 === -1) {
-            console.log("Both snakes exploded");
+            this.details = "Both snakes exploded";
             cb(0);
           } else if (d1 === -1) {
-            console.log("You exploded");
+            this.details = "You exploded";
             cb(2);
           } else if (d2 === -1) {
-            console.log("Your opponent exploded");
+            this.details = "Your opponent exploded";
             cb(1);
           } else {
             let ns1x = s1x + this.width;
@@ -158,7 +162,7 @@ export class SnakeGridComponent implements OnInit, AfterViewInit {
             ns2y %= this.height;
 
             if (ns1x === ns2x && ns1y === ns2y) {
-              console.log("You collided head-on");
+              this.details = "You collided head on";
               if (this.grid[ns1y][ns1x] !== "apple") {
                 const [removed1] = s1Trail.splice(0, 1);
                 this.grid[removed1[1]][removed1[0]] = "empty";
@@ -226,11 +230,11 @@ export class SnakeGridComponent implements OnInit, AfterViewInit {
       }
       setTimeout(() => handleMove((winner: number) => {
         if (winner === 0) {
-          console.log("You tied :/");
+          this.winner = "You tied :/";
         } else if (winner === 1) {
-          console.log("You win :)");
+          this.winner = "You win :)";
         } else {
-          console.log("Opponent wins :(")
+          this.winner = "You lose :(";
         }
         this.playingGame = false;
       }), 1000 / this.turnsPerSecond);
