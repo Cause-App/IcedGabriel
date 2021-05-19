@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {NgcCookieConsentModule, NgcCookieConsentConfig} from 'ngx-cookieconsent';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -19,6 +20,22 @@ import { SnakeOptionsComponent } from './games/snake/snake-options/snake-options
 import { WarningsComponent } from './widgets/warnings/warnings.component';
 import { SnakePlayerComponent } from './games/snake/snake-player/snake-player.component';
 import { SnakeGridComponent } from './games/snake/snake-player/snake-grid/snake-grid.component';
+
+const cookieConfig:NgcCookieConsentConfig = {
+  cookie: {
+    domain: 'localhost'
+  },
+  palette: {
+    popup: {
+      background: '#000'
+    },
+    button: {
+      background: '#f1d600'
+    }
+  },
+  theme: 'classic',
+  type: 'info'
+};
 
 @NgModule({
   declarations: [
@@ -42,7 +59,8 @@ import { SnakeGridComponent } from './games/snake/snake-player/snake-grid/snake-
     OAuthModule.forRoot(),
     FontAwesomeModule,
     AngularSplitModule,
-    DragulaModule.forRoot()
+    DragulaModule.forRoot(),
+    NgcCookieConsentModule.forRoot(cookieConfig)
   ],
   providers: [],
   bootstrap: [AppComponent]
