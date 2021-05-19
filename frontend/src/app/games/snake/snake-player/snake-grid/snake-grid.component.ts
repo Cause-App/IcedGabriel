@@ -186,7 +186,7 @@ export class SnakeGridComponent implements OnInit, AfterViewInit {
             ns2y %= this.height;
 
             if (ns1x === ns2x && ns1y === ns2y) {
-              this.details = "You collided head on";
+              this.details = "You collided head-on";
               if (this.grid[ns1y][ns1x] !== "apple") {
                 const [removed1] = s1Trail.splice(0, 1);
                 this.grid[removed1[1]][removed1[0]] = "empty";
