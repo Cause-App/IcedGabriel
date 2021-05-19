@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { WarningsService } from 'src/app/services/warnings.service';
 
 type gridContent = "empty" | "snake1" | "snake2" | "apple" | "collision";
@@ -8,7 +8,7 @@ type gridContent = "empty" | "snake1" | "snake2" | "apple" | "collision";
   templateUrl: './snake-grid.component.html',
   styleUrls: ['./snake-grid.component.scss']
 })
-export class SnakeGridComponent implements OnInit {
+export class SnakeGridComponent implements OnInit, AfterViewInit {
 
   constructor(private warnings: WarningsService) {
     this.clearGrid();
@@ -16,10 +16,60 @@ export class SnakeGridComponent implements OnInit {
 
   @Input() width: number = 16;
   @Input() height: number = 16;
+  cellWidth: number = 32;
+  cellHeight: number = 32;
+
+  @ViewChild("canvas") canvasRef?: ElementRef;
 
   private turnsPerSecond = 10;
   public playingGame: boolean = false;
   public cancelledGame: boolean = false;
+
+  private drawCanvas() {
+    if (!this.canvasRef) {
+      return;
+    }
+    const ctx: CanvasRenderingContext2D = this.canvasRef.nativeElement.getContext("2d");
+    const width = this.width*this.cellWidth;
+    const height = this.height*this.cellHeight;
+
+    // ctx.translate(0.5,0.5);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+
+    for (let y=0; y<this.grid.length; y++) {
+      for (let x=0; x<this.grid[y].length; x++) {
+        const v = this.grid[y][x];
+        if (v === "empty") {
+          continue;
+        } else if (v === "snake1") {
+          ctx.fillStyle = "#ff0000";
+        } else if (v === "snake2") {
+          ctx.fillStyle = "#0000ff";
+        } else if (v === "apple") {
+          ctx.fillStyle = "#00ff00";
+        } else if (v === "collision") {
+          ctx.fillStyle = "#ff00ff";
+        }
+        ctx.fillRect(x*this.cellWidth, y*this.cellHeight, this.cellWidth, this.cellHeight);
+      }
+    }
+
+    ctx.fillStyle = "#000000";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let y=0; y<=this.height; y++) {
+      ctx.moveTo(0, y*this.cellHeight);
+      ctx.lineTo(width, y*this.cellHeight);
+    }
+    
+    for (let x=0; x<=this.width; x++) {
+      ctx.moveTo(x*this.cellWidth, 0);
+      ctx.lineTo(x*this.cellWidth, height);
+    }
+    ctx.stroke();
+
+  }
 
   @Input() set gameString(game: string) {
     if (this.playingGame) {
@@ -56,6 +106,7 @@ export class SnakeGridComponent implements OnInit {
       this.grid[s2y][s2x] = "snake2";
       this.grid[ay][ax] = "apple";
 
+      this.drawCanvas();
 
       let index = 8;
       const handleMove = (cb: (winner: number) => void) => {
@@ -167,6 +218,7 @@ export class SnakeGridComponent implements OnInit {
               }
             }
           }
+          this.drawCanvas();
         } catch (e) {
           console.error(e);
           this.warnings.setWarning("invalidGame", true);
@@ -217,9 +269,14 @@ export class SnakeGridComponent implements OnInit {
       }
       this.grid.push(row);
     }
+    this.drawCanvas();
   }
 
   ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
+    this.drawCanvas();
   }
 
 }
