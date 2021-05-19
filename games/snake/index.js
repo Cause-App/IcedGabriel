@@ -20,6 +20,11 @@ const runningGamesPath = "./RunningGames";
 
 const MAX_GAMES = 5;
 
+const GRID_WIDTH = 16;
+const GRID_HEIGHT = 16;
+const SNAKE_MOVE_MAX_MILLIS = 200;
+const MAX_ROUNDS = 1000;
+
 const router = express.Router();
 
 const filenameValid = (filename) => {
@@ -212,7 +217,7 @@ router.get("/play", requireLogin, async (req, res) => {
 
         await runCommand(`cd ${gamePath} && javac logic/Program.java`);
 
-        const output = await runCommand(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==./snake.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${gamePath} logic.Program`);
+        const output = await runCommand(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==./snake.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${gamePath} logic.Program ${GRID_WIDTH} ${GRID_HEIGHT} ${SNAKE_MOVE_MAX_MILLIS} ${MAX_ROUNDS}`);
 
         res.json(output);
 

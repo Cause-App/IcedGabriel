@@ -8,10 +8,10 @@ import logic.Slitherable.Direction;
 
 public class Program {
 
-	private static final int GRID_WIDTH = 16;
-	private static final int GRID_HEIGHT = 16;
-	private static final int SNAKE_MOVE_MAX_MILLIS = 200;
-	private static final int MAX_ROUNDS = 1000;
+	private static int GRID_WIDTH;
+	private static int GRID_HEIGHT;
+	private static int SNAKE_MOVE_MAX_MILLIS;
+	private static int MAX_ROUNDS;
 
 	private static class SnakeThread implements Runnable {
 		private final Game game;
@@ -207,6 +207,16 @@ public class Program {
 	private static Game game;
 
 	public static void main(String[] args) {
+		if (args.length < 4) {
+			System.err.println("Expected 4 arguments but only received "+args.length);
+			System.exit(1);
+		}
+
+		GRID_WIDTH = Integer.parseInt(args[0]);
+		GRID_HEIGHT = Integer.parseInt(args[1]);
+		SNAKE_MOVE_MAX_MILLIS = Integer.parseInt(args[2]);
+		MAX_ROUNDS = Integer.parseInt(args[3]);
+
 		String log = ""+GRID_WIDTH+","+GRID_HEIGHT;
 		game = new Game();
 
