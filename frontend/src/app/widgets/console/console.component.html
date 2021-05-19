@@ -1,0 +1,6 @@
+<div class="console" #console>
+    <div>Program output:</div>
+    <div>{{"&oline;".repeat("Program output:".length)}}</div>
+    <div>&nbsp;</div>
+    <div *ngFor="let line of consoleService.data.split('\n')">{{line}}&nbsp;</div>
+</div>

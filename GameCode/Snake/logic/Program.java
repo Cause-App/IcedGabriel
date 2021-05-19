@@ -1,5 +1,6 @@
 package logic;
 
+import java.io.*;
 import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.*;
@@ -26,23 +27,41 @@ public class Program {
 
 		@Override
 		public void run() {
-			int myX, myY, enemyX, enemyY;
-			if (s1) {
-				myX = game.s1x;
-				myY = game.s1y;
-				enemyX = game.s2x;
-				enemyY = game.s2y;
-			} else {
-				myX = game.s2x;
-				myY = game.s2y;
-				enemyX = game.s1x;
-				enemyY = game.s1y;
-			}
-			Direction d = snake.move(myX, myY, enemyX, enemyY, game.ax, game.ay);
-			if (s1) {
-				game.s1Move = d;
-			} else {
-				game.s2Move = d;
+			PrintStream stdout = System.out;
+			PrintStream stderr = System.err;
+
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+			try (PrintStream ps = new PrintStream(baos)) {
+				System.setOut(ps);
+				System.setErr(ps);
+				int myX, myY, enemyX, enemyY;
+				if (s1) {
+					myX = game.s1x;
+					myY = game.s1y;
+					enemyX = game.s2x;
+					enemyY = game.s2y;
+				} else {
+					myX = game.s2x;
+					myY = game.s2y;
+					enemyX = game.s1x;
+					enemyY = game.s1y;
+				}
+				Direction d = snake.move(myX, myY, enemyX, enemyY, game.ax, game.ay);
+				if (s1) {
+					game.s1Move = d;
+				} else {
+					game.s2Move = d;
+				}
+
+			} catch (Exception e) {
+				throw e;
+			} finally {
+				System.setOut(stdout);
+				System.setErr(stderr);
+				if (s1) {
+					game.s1Out = baos.toString();
+				}
 			}
 		}
 	}
@@ -61,6 +80,8 @@ public class Program {
 
 		public Direction s1Move;
 		public Direction s2Move;
+
+		public String s1Out;
 
 		public void newRound() {
 			s1Move = null;
@@ -204,6 +225,10 @@ public class Program {
 		return 3;
 	}
 
+	private static String encode(String x) {
+		return x.replace("\r", "").replace("&", "&amp;").replace("\n", "&newline;").replace(":", "&colon;");
+	}
+
 	private static Game game;
 
 	public static void main(String[] args) {
@@ -227,6 +252,8 @@ public class Program {
 
 		log += ","+game.s1x+","+game.s1y+","+game.s2x+","+game.s2y+","+game.ax+","+game.ay;
 
+		String s1Out = "";
+
 		boolean over;
 		int rounds = 0;
 		try {
@@ -237,8 +264,17 @@ public class Program {
 				try {
 					f1.get(SNAKE_MOVE_MAX_MILLIS, TimeUnit.MILLISECONDS);
 				} catch (TimeoutException | InterruptedException | ExecutionException e) {
+					StringWriter sw = new StringWriter();
+					PrintWriter pw = new PrintWriter(sw);
+					e.printStackTrace(pw);
+					game.s1Out += sw.toString();
 					f1.cancel(true);
 				}
+
+				if (game.s1Out.length() > 0) {
+					s1Out += ""+rounds+":"+encode(game.s1Out)+"\n";
+				}
+
 				Future f2 = executor.submit(s2);
 				try {
 					f2.get(SNAKE_MOVE_MAX_MILLIS, TimeUnit.MILLISECONDS);
@@ -339,7 +375,8 @@ public class Program {
 				log += ",-1,-1,0";
 			}
 
-			System.out.print(log);
+			System.out.println(log);
+			System.out.print(s1Out.substring(0, s1Out.length()-1));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

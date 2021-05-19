@@ -1,4 +1,6 @@
 grant {
+        permission java.lang.RuntimePermission "setIO";
+
         permission java.util.PropertyPermission "java.vendor", "read";
         permission java.util.PropertyPermission "java.vendor.url", "read";
         permission java.util.PropertyPermission "java.class.version", "read";

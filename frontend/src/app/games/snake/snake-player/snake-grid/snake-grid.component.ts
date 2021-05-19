@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { WarningsService } from 'src/app/services/warnings.service';
+import { ConsoleService } from 'src/app/services/console.service';
 
 type gridContent = "empty" | "snake1" | "snake2" | "apple" | "collision";
 
@@ -10,7 +11,7 @@ type gridContent = "empty" | "snake1" | "snake2" | "apple" | "collision";
 })
 export class SnakeGridComponent implements OnInit, AfterViewInit {
 
-  constructor(private warnings: WarningsService) {
+  constructor(private warnings: WarningsService, private consoleService: ConsoleService) {
     this.clearGrid();
   }
 
@@ -89,9 +90,25 @@ export class SnakeGridComponent implements OnInit, AfterViewInit {
       this.details = "";
       this.playingGame = true;
       this.cancelledGame = false;
-      const parts: number[] = game.split(",").map(x => +x);
+      const lines = game.split("\n");
+      const parts: number[] = lines[0].split(",").map(x => +x);
       this.width = parts[0];
       this.height = parts[1];
+
+      const logMessages: {[key: number]: string} = {};
+
+      const log = (msg: string) => {
+        msg = msg.replace(/&colon;/g, ":").replace(/&newline;/g, "\n").replace(/&amp;/g, "&");
+        this.consoleService.log(msg);
+      }
+
+      for (let x=1; x<lines.length; x++) {
+        if (!lines[x]) {
+          continue;
+        }
+        const [r, l] = lines[x].split(":");
+        logMessages[+r] = l;
+      }
 
       this.clearGrid();
 
@@ -112,16 +129,23 @@ export class SnakeGridComponent implements OnInit, AfterViewInit {
 
       this.drawCanvas();
 
+      let round = 1;
+      if (logMessages[0]) {
+        log(logMessages[0]);
+      }
+
       let index = 8;
       const handleMove = (cb: (winner: number) => void) => {
         try {
+          if (logMessages[round]) {
+            log(logMessages[round++]);
+          }
           if (this.cancelledGame) {
             this.playingGame = false;
             return;
           }
           const d1 = parts[index++];
           const d2 = parts[index++];
-
           if (d1 === -1 && d2 === -1) {
             this.details = "Both snakes exploded";
             cb(0);

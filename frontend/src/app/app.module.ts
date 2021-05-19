@@ -20,6 +20,7 @@ import { SnakeOptionsComponent } from './games/snake/snake-options/snake-options
 import { WarningsComponent } from './widgets/warnings/warnings.component';
 import { SnakePlayerComponent } from './games/snake/snake-player/snake-player.component';
 import { SnakeGridComponent } from './games/snake/snake-player/snake-grid/snake-grid.component';
+import { ConsoleComponent } from './widgets/console/console.component';
 
 const cookieConfig:NgcCookieConsentConfig = {
   cookie: {
@@ -49,7 +50,8 @@ const cookieConfig:NgcCookieConsentConfig = {
     SnakeOptionsComponent,
     WarningsComponent,
     SnakePlayerComponent,
-    SnakeGridComponent
+    SnakeGridComponent,
+    ConsoleComponent
   ],
   imports: [
     BrowserModule,

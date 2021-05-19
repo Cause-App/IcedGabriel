@@ -36,7 +36,7 @@ const runCommand = (command) => {
     return new Promise((resolve, reject) => {
         exec(command, (err, stdout, stderr) => {
             if (err) {
-                reject(err);
+                reject({ err, stdout, stderr });
             } else {
                 resolve({ stdout, stderr });
             }
@@ -180,7 +180,7 @@ router.get("/deletesnake", requireLogin, (req, res) => {
         )
         res.json({});
     } catch (e) {
-        res.json({err: e});
+        res.json({ err: e });
     }
 });
 

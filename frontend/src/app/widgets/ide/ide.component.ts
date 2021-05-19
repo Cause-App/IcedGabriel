@@ -179,7 +179,8 @@ export class IdeComponent implements OnInit, AfterViewInit {
         enableBasicAutocompletion: true,
         enableSnippets: true,
         enableLiveAutocompletion: false,
-        mergeUndoDeltas: true
+        mergeUndoDeltas: true,
+        firstLineNumber: 2
       });
 
       this.aceEditor.commands.addCommand({
