@@ -21,19 +21,20 @@ const DEFAULT_SNAKE_NAME = "An unnamed snake";
 })
 export class SnakeOptionsComponent implements OnInit {
 
-  constructor(private api: ApiService, private gameList: GameListService, private warnings: WarningsService, private user: UserDataService) { }
+  constructor(private api: ApiService, private gameList: GameListService, private warnings: WarningsService, private user: UserDataService) {
+  }
 
   snakes: Snake[] = [];
-  private snakesById: {[key: string]: Snake} = {};
+  private snakesById: { [key: string]: Snake } = {};
 
   pickingOtherSnake = false;
 
   snakeName: string = DEFAULT_SNAKE_NAME;
   snakeID: string | undefined | null;
 
-  @Input() getFiles: () => CodeFile[] = () => {return []};
-  @Input() onFilesLoaded: (files: CodeFile[]) => void = () => {};
-  @Input() onIdChanged: (id: string | undefined | null) => void = () => {};
+  @Input() getFiles: () => CodeFile[] = () => { return [] };
+  @Input() onFilesLoaded: (files: CodeFile[]) => void = () => { };
+  @Input() onIdChanged: (id: string | undefined | null) => void = () => { };
   @Input() onCodeChanged?: EventEmitter<void>;
 
   snakeUpdated(): void {
@@ -47,11 +48,33 @@ export class SnakeOptionsComponent implements OnInit {
     this.save();
     this.onIdChanged(this.snakeID);
   }
-  
-  async save(): Promise<void> {
+
+  private saveCooldown: number = 1000;
+  private saveInterrupted: number = 0;
+  private saving: boolean = false;
+
+  save(): void {
+    if (this.saving) {
+      this.saveInterrupted++;
+    } else {
+      this.saving = true;
+      this.saveInterrupted = 0;
+    }
+    setTimeout(() => {
+      if (this.saveInterrupted > 0) {
+        this.saveInterrupted--;
+      } else {
+        this.realSave();
+        this.saving = false;
+      }
+    }, this.saveCooldown);
+  }
+
+  async realSave(): Promise<void> {
     if (!this.snakeName || this.snakeID === null) {
       return;
     }
+
     const code = this.getFiles();
     const snakeID = this.snakeID;
     if (!this.snakeID || this.snakeID === "undefined") {
@@ -59,9 +82,9 @@ export class SnakeOptionsComponent implements OnInit {
     }
     let response: any;
     try {
-      response = await this.api.post("snake/editsnake", {id: snakeID, name: this.snakeName, code});
+      response = await this.api.post("snake/editsnake", { id: snakeID, name: this.snakeName, code });
     } catch {
-      response = {err: "Could not connect to server"};
+      response = { err: "Could not connect to server" };
     }
     if (response.err) {
       this.warnings.setWarning("unsavedChanges", true);
@@ -69,6 +92,7 @@ export class SnakeOptionsComponent implements OnInit {
       return;
     }
     this.warnings.setWarning("unsavedChanges", false);
+    this.warnings.setWarning("save", true);
     if (response.id) {
       const newSnake: Snake = {
         _id: response.id,
@@ -113,15 +137,20 @@ export class SnakeOptionsComponent implements OnInit {
     const promptString = `Are you sure you want to delete this snake? You will be unable to play as this snake; others will be unable to play against this snake; its rank in the leaderboard will be lost. This action is irreversible. Please enter '${this.snakeName}' to confirm`;
     if (prompt(promptString) !== this.snakeName) {
       return;
-    } 
-    const response: any = await this.api.get("snake/deletesnake", {id: this.snakeID});
+    }
+    let response: any;
+    try {
+      response = await this.api.get("snake/deletesnake", { id: this.snakeID });
+    } catch {
+      response = { err: "Could not connect to server" };
+    }
     if (response.err) {
       console.error(response.err);
       this.warnings.setWarning("failedToDelete", true);
     } else {
       delete this.snakesById[this.snakeID];
       this.snakes = this.snakes.filter(x => x._id !== this.snakeID);
-      this.snakeID = this.snakes.length ? this.snakes[0]._id: undefined;
+      this.snakeID = this.snakes.length ? this.snakes[0]._id : undefined;
       this.snakeUpdated();
     }
   }

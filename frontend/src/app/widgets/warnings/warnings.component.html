@@ -1,15 +1,18 @@
-<div class="warning unsaved-changes" [ngClass]="{hidden: !warnings.includes('unsavedChanges'), depressed:depressed['unsavedChanges']}" (click)="depressed['unsavedChanges']=!depressed['unsavedChanges']">
+<div class="warning unsaved-changes" [ngStyle]="{top: getTop('unsavedChanges')}" [ngClass]="{hidden: !warnings.includes('unsavedChanges'), depressed:depressed['unsavedChanges']}" (click)="depressed['unsavedChanges']=!depressed['unsavedChanges']">
     <span>Your latest changes weren't able to be saved.</span>
     <span>Once the problem is fixed this banner will disappear</span>
 </div>
-<div class="warning faild-to-compile" [ngClass]="{hidden: !warnings.includes('failedToCompile'), depressed:depressed['failedToCompile']}" (click)="depressed['failedToCompileSnake']=!depressed['failedToCompileSnake']">
+<div class="warning faild-to-compile" [ngStyle]="{top: getTop('failedToCompile')}" [ngClass]="{hidden: !warnings.includes('failedToCompile'), depressed:depressed['failedToCompile']}" (click)="depressed['failedToCompileSnake']=!depressed['failedToCompileSnake']">
     <span>The code failed to compile</span>
     <span>This could be a problem with your code,</span>
     <span>or your opponent's code.</span>
 </div>
-<div class="warning invalid-game" [ngClass]="{hidden: !warnings.includes('invalidGame'), depressed:depressed['invalidGame']}" (click)="depressed['invalidGame']=!depressed['invalidGame']">
+<div class="warning invalid-game" [ngStyle]="{top: getTop('invalidGame')}" [ngClass]="{hidden: !warnings.includes('invalidGame'), depressed:depressed['invalidGame']}" (click)="depressed['invalidGame']=!depressed['invalidGame']">
     <span>Something went wrong with this game.</span>
 </div>
-<div class="warning invalid-game" [ngClass]="{hidden: !warnings.includes('failedToDelete'), depressed:depressed['failedToDelete']}" (click)="depressed['failedToDelete']=!depressed['failedToDelete']">
+<div class="warning failed-to-delete" [ngStyle]="{top: getTop('failedToDelete')}" [ngClass]="{hidden: !warnings.includes('failedToDelete'), depressed:depressed['failedToDelete']}" (click)="depressed['failedToDelete']=!depressed['failedToDelete']">
     <span>We were unable to delete this for you.</span>
+</div>
+<div class="warning save" [ngStyle]="{top: getTop('save')}" [ngClass]="{hidden: !warnings.includes('save'), depressed:depressed['save']}" (click)="depressed['save']=!depressed['save']">
+    <span>Saved changes</span>
 </div>

@@ -17,6 +17,14 @@ export class WarningsComponent implements OnInit {
     })
   }
 
+  getTop(w: warning): string {
+    if (this.warnings.includes(w)) {
+      return ""+(this.warnings.indexOf(w)*5+3)+"em";
+    } else {
+      return "0";
+    }
+  }
+
   ngOnInit(): void {
   }
 
