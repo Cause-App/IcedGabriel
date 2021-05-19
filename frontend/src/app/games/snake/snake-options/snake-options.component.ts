@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { WarningsService } from 'src/app/services/warnings.service';
 import { CodeFile, GameListService } from 'src/app/services/game-list.service';
@@ -37,6 +37,8 @@ export class SnakeOptionsComponent implements OnInit {
   @Input() onIdChanged: (id: string | undefined | null) => void = () => { };
   @Input() onCodeChanged?: EventEmitter<void>;
 
+  @Input() onChangesMade: (changesMade: boolean) => void = () => { };
+
   snakeUpdated(): void {
     if (this.snakeID && this.snakeID !== "undefined") {
       this.snakeName = this.snakesById[this.snakeID].name;
@@ -54,6 +56,7 @@ export class SnakeOptionsComponent implements OnInit {
   private saving: boolean = false;
 
   save(): void {
+    this.onChangesMade(true);
     if (this.saving) {
       this.saveInterrupted++;
     } else {
@@ -91,6 +94,7 @@ export class SnakeOptionsComponent implements OnInit {
       console.error(response.err);
       return;
     }
+    this.onChangesMade(false);
     this.warnings.setWarning("unsavedChanges", false);
     this.warnings.setWarning("save", true);
     if (response.id) {

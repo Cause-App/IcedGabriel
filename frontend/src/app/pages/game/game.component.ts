@@ -1,5 +1,6 @@
-import { AfterViewInit, Component, ComponentFactoryResolver, EventEmitter, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ComponentFactoryResolver, EventEmitter, HostListener, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ChangeableComponent, checkSaveChangesBeforeLeave } from 'src/app/guards/changes-made.guard';
 import { CodeFile, Game, GameListService } from 'src/app/services/game-list.service';
 
 @Component({
@@ -7,10 +8,11 @@ import { CodeFile, Game, GameListService } from 'src/app/services/game-list.serv
   templateUrl: './game.component.html',
   styleUrls: ['./game.component.scss']
 })
-export class GameComponent implements OnInit, AfterViewInit {
+export class GameComponent implements OnInit, AfterViewInit, ChangeableComponent {
 
   public game?: Game;
   public resizeEmitter: EventEmitter<void> = new EventEmitter<void>();
+  public changesMade: boolean = false;
 
   codeChanged: EventEmitter<void> = new EventEmitter<void>();
 
@@ -63,6 +65,9 @@ export class GameComponent implements OnInit, AfterViewInit {
         reference.instance.onFilesLoaded = this.codeFilesLoaded.bind(this);
         reference.instance.onCodeChanged = this.codeChanged;
         reference.instance.onIdChanged = this.onPlayerIdChange.bind(this);
+        reference.instance.onChangesMade = (x: boolean) => {
+          this.changesMade = x;
+        }
       }
       if (this.playerContainer) {
         this.playerContainer.clear();
@@ -77,6 +82,14 @@ export class GameComponent implements OnInit, AfterViewInit {
 
   resized(): void {
     this.resizeEmitter.emit();
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  onbeforeunload(event: Event) {
+    if (this.changesMade && !checkSaveChangesBeforeLeave()) {
+      event.preventDefault();
+      event.returnValue = false;
+    }
   }
 
 }
