@@ -5,6 +5,7 @@ const fse = require("fs-extra");
 const { exec } = require('child_process');
 const path = require("path");
 const mongo = require('mongodb')
+const validFilename = require('valid-filename');
 
 const initialHeapSize = 1024 * 1024 * 2;
 // The default size is 2097152 (2MB). 
@@ -28,8 +29,7 @@ const MAX_ROUNDS = 1000;
 const router = express.Router();
 
 const filenameValid = (filename) => {
-    // TODO validate filename
-    return true;
+    return validFilename(filename);
 }
 
 const runCommand = (command) => {
