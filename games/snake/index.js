@@ -209,7 +209,8 @@ router.get("/play", requireLogin, async (req, res) => {
 
             for (const { filename, code } of snakeCode) {
                 if (filenameValid(filename)) {
-                    fs.writeFileSync(path.join(snakePath, filename), `package ${package};\n${code}`);
+                    const toWrite = filename.endsWith(".java") ? `package ${package};\n${code}` : code;
+                    fs.writeFileSync(path.join(snakePath, filename), toWrite);
                 }
             }
 
