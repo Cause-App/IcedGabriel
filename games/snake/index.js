@@ -38,7 +38,7 @@ const runCommand = (command) => {
             if (err) {
                 reject(err);
             } else {
-                resolve({stdout, stderr});
+                resolve({ stdout, stderr });
             }
         });
     });
@@ -159,7 +159,30 @@ router.post("/editsnake", requireLogin, (req, res) => {
             }
         )
     }
-})
+});
+
+router.get("/deletesnake", requireLogin, (req, res) => {
+    const snakeCollection = db.db.collection("snake");
+
+    const id = req.query.id && req.query.id !== "undefined" ? req.query.id : undefined;
+
+    if (!id) {
+        res.json({ err: "No snake ID specified" });
+        return;
+    }
+
+    try {
+        snakeCollection.deleteOne(
+            {
+                owner: req.userid,
+                _id: mongo.ObjectId(id)
+            },
+        )
+        res.json({});
+    } catch (e) {
+        res.json({err: e});
+    }
+});
 
 router.get("/play", requireLogin, async (req, res) => {
     const snakeCollection = db.db.collection("snake");
@@ -188,13 +211,13 @@ router.get("/play", requireLogin, async (req, res) => {
         const existing = fs.readdirSync(runningGamesPath).length;
         if (existing >= MAX_GAMES) {
             // TODO replace with a queue system
-            res.json( { err: "Too many games being played" } );
+            res.json({ err: "Too many games being played" });
             return;
         }
 
         gamePath = path.join(runningGamesPath, `Game${existing}`);
     } catch (err) {
-        res.json({err: "Failed to read the running games directory"});
+        res.json({ err: "Failed to read the running games directory" });
         return;
     }
     try {

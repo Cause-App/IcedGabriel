@@ -1,8 +1,8 @@
 import { EventEmitter, Injectable } from '@angular/core';
 
 
-export type warning = "unsavedChanges" | "failedToCompileSnake" | "invalidGame";
-const temporaryWarnings: warning[] = ["failedToCompileSnake", "invalidGame"];
+export type warning = "unsavedChanges" | "failedToCompile" | "invalidGame" | "failedToDelete";
+const temporaryWarnings: warning[] = ["failedToCompile", "invalidGame", "failedToDelete"];
 const temporaryWarningDuration = 3000;
 
 @Injectable({

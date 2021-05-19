@@ -37,13 +37,13 @@ export class SnakePlayerComponent implements OnInit {
       const response: any = await this.api.get("snake/play", { myId: this.myId, opponentId: this.opponentId });
       if (response.err) {
         console.error(response.err);
-        this.warnings.setWarning("failedToCompileSnake", true);
+        this.warnings.setWarning("failedToCompile", true);
       } else {
         this.gameString = response.stdout;
       }  
     } catch (e) {
       console.error(e);
-      this.warnings.setWarning("failedToCompileSnake", true);
+      this.warnings.setWarning("failedToCompile", true);
     }
   }
 

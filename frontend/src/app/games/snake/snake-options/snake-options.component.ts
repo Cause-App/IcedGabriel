@@ -12,7 +12,7 @@ export interface Snake {
   ownerName?: string;
 }
 
-const DEFAULT_SNAKE_NAME = "Un unnamed snake";
+const DEFAULT_SNAKE_NAME = "An unnamed snake";
 
 @Component({
   selector: 'app-snake-options',
@@ -80,7 +80,7 @@ export class SnakeOptionsComponent implements OnInit {
       this.snakes.push(newSnake);
       this.snakesById[response.id] = newSnake;
       this.snakeID = response.id;
-      this.onIdChanged(this.snakeID);
+      this.snakeUpdated();
     } else if (snakeID && snakeID !== "undefined" && this.snakesById[snakeID]) {
       this.snakesById[snakeID].name = this.snakeName;
       this.snakesById[snakeID].code = code;
@@ -104,6 +104,26 @@ export class SnakeOptionsComponent implements OnInit {
     this.onCodeChanged?.subscribe(() => {
       this.save();
     });
+  }
+
+  async deleteSnake(): Promise<void> {
+    if (!this.snakeID) {
+      return;
+    }
+    const promptString = `Are you sure you want to delete this snake? You will be unable to play as this snake; others will be unable to play against this snake; its rank in the leaderboard will be lost. This action is irreversible. Please enter '${this.snakeName}' to confirm`;
+    if (prompt(promptString) !== this.snakeName) {
+      return;
+    } 
+    const response: any = await this.api.get("snake/deletesnake", {id: this.snakeID});
+    if (response.err) {
+      console.error(response.err);
+      this.warnings.setWarning("failedToDelete", true);
+    } else {
+      delete this.snakesById[this.snakeID];
+      this.snakes = this.snakes.filter(x => x._id !== this.snakeID);
+      this.snakeID = this.snakes.length ? this.snakes[0]._id: undefined;
+      this.snakeUpdated();
+    }
   }
 
 }
