@@ -2,3 +2,11 @@
     <span>Your latest changes weren't able to be saved.</span>
     <span>Once the problem is fixed this banner will disappear</span>
 </div>
+<div class="warning faild-to-compile-snake" [ngClass]="{hidden: !warnings.includes('failedToCompileSnake'), depressed:depressed['failedToCompileSnake']}" (click)="depressed['failedToCompileSnake']=!depressed['failedToCompileSnake']">
+    <span>These snakes failed to compile</span>
+    <span>This could be a problem with your snake,</span>
+    <span>or the opponent snake.</span>
+</div>
+<div class="warning invalid-game" [ngClass]="{hidden: !warnings.includes('invalidGame'), depressed:depressed['invalidGame']}" (click)="depressed['invalidGame']=!depressed['invalidGame']">
+    <span>Something went wrong with this game.</span>
+</div>

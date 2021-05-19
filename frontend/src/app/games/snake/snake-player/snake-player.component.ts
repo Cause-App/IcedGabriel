@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
+import { WarningsService } from 'src/app/services/warnings.service';
 import { Snake } from '../snake-options/snake-options.component';
 
 @Component({
@@ -18,7 +19,7 @@ export class SnakePlayerComponent implements OnInit {
 
   public gameString: string = "";
 
-  constructor(private api: ApiService) { }
+  constructor(private api: ApiService, private warnings: WarningsService) { }
 
   async ngOnInit(): Promise<void> {
     const response: any = await this.api.get("snake/getAllSnakes", {});
@@ -35,6 +36,7 @@ export class SnakePlayerComponent implements OnInit {
     const response: any = await this.api.get("snake/play", { myId: this.myId, opponentId: this.opponentId });
     if (response.err) {
       console.error(response.err);
+      this.warnings.setWarning("failedToCompileSnake", true);
     } else {
       this.gameString = response.stdout;
     }

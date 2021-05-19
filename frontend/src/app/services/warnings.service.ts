@@ -1,7 +1,9 @@
 import { EventEmitter, Injectable } from '@angular/core';
 
 
-export type warning = "unsavedChanges";
+export type warning = "unsavedChanges" | "failedToCompileSnake" | "invalidGame";
+const temporaryWarnings: warning[] = ["failedToCompileSnake", "invalidGame"];
+const temporaryWarningDuration = 3000;
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +19,11 @@ export class WarningsService {
   setWarning(w: warning, x: boolean): void {
     if (x && !this.warnings.includes(w)) {
       this.warnings.push(w);
+      if (temporaryWarnings.includes(w)) {
+        setTimeout(() => {
+          this.setWarning(w, false);
+        }, temporaryWarningDuration);
+      }
     } else if (!x) {
       this.warnings = this.warnings.filter((e) => e !== w);
     }
