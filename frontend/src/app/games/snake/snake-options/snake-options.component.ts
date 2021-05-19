@@ -80,6 +80,7 @@ export class SnakeOptionsComponent implements OnInit {
       this.snakes.push(newSnake);
       this.snakesById[response.id] = newSnake;
       this.snakeID = response.id;
+      this.onIdChanged(this.snakeID);
     } else if (snakeID && snakeID !== "undefined" && this.snakesById[snakeID]) {
       this.snakesById[snakeID].name = this.snakeName;
       this.snakesById[snakeID].code = code;
