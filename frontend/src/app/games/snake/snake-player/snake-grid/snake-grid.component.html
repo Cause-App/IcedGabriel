@@ -1,7 +1,7 @@
+<label>
+    1 turn/s<input type="range" min="1" max="100" [(ngModel)]="turnsPerSecond">100 turns/s
+</label>
 <div class="container">
-    <!-- <div class="grid" [ngStyle]="gridStyle">
-        <div *ngFor="let pos of gridPos" [ngStyle]="{borderWidth: ''+(1/width)+'px'}" [class]="'cell '+grid[pos.y][pos.x]"></div>
-    </div> -->
     <canvas #canvas [width]="width*cellWidth" [height]="height*cellHeight"></canvas>
 </div>
 <button *ngIf="playingGame && !cancelledGame" class="button1" (click)="cancelledGame=true">Cancel</button>

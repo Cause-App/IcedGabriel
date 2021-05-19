@@ -24,7 +24,7 @@ export class SnakeGridComponent implements OnInit, AfterViewInit {
 
   @ViewChild("canvas") canvasRef?: ElementRef;
 
-  private turnsPerSecond = 10;
+  public turnsPerSecond = 10;
   public playingGame: boolean = false;
   public cancelledGame: boolean = false;
 
