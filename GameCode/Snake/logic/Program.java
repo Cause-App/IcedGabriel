@@ -5,7 +5,7 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.*;
 
-import logic.Slitherable.Direction;
+import logic.Direction;
 
 public class Program {
 
@@ -376,7 +376,7 @@ public class Program {
 			}
 
 			System.out.println(log);
-			System.out.print(s1Out.substring(0, s1Out.length()-1));
+			System.out.print(s1Out.substring(0, Math.max(0,s1Out.length()-1)));
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

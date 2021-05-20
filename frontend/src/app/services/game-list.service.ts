@@ -33,6 +33,7 @@ export class GameListService {
           protected: true,
           code:
             `import logic.Slitherable;
+import logic.Direction;
 
 public class Snake implements Slitherable {
   
