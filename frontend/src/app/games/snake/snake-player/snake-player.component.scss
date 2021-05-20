@@ -5,6 +5,11 @@
     flex-direction: column;
 }
 
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
 .opponent {
     display: flex;
     align-items: center;
@@ -14,4 +19,13 @@
 
 select {
     text-align: center;
+}
+
+.queue {
+    width: 80%;
+    text-align: center;
+}
+
+.queue, .cancel {
+    margin-top: 1em;
 }

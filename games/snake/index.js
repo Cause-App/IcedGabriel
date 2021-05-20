@@ -1,5 +1,6 @@
 const express = require("express");
 const { db, requireLogin, validateToken } = require("../../common");
+const { enqueue, onDequeue, queue, removeFromQueue } = require("..");
 const fs = require("fs");
 const fse = require("fs-extra");
 const { exec } = require('child_process');
@@ -17,9 +18,7 @@ const maxHeapSize = 1024 * 1024 * 64;
 
 const threadStackSize = 1024 * 512;
 const snakeCodePath = "./GameCode/Snake";
-const runningGamesPath = "./RunningGames";
 
-const MAX_GAMES = 5;
 
 const GRID_WIDTH = 16;
 const GRID_HEIGHT = 16;
@@ -184,7 +183,7 @@ router.get("/deletesnake", requireLogin, (req, res) => {
     }
 });
 
-const playGame = async (s1ID, s2ID, requireS1Owner, callback) => {
+const submitGame = async (s1ID, s2ID, requireS1Owner, callback) => {
     const snakeCollection = db.db.collection("snake");
 
     const s1Query = { _id: mongo.ObjectId(s1ID) };
@@ -195,27 +194,38 @@ const playGame = async (s1ID, s2ID, requireS1Owner, callback) => {
     const mySnake = await snakeCollection.findOne(s1Query);
     if (!mySnake) {
         callback({ err: "Your snake does not exist or you do not own it" });
+        return;
     }
 
     const opponentSnake = await snakeCollection.findOne({ _id: mongo.ObjectId(s2ID) });
     if (!opponentSnake) {
         callback({ err: "Your opponent's snake does not exist" });
+        return;
     }
 
-    let gamePath;
-    try {
-        const existing = fs.readdirSync(runningGamesPath).length;
-        if (existing >= MAX_GAMES) {
-            // TODO replace with a queue system
-            callback({ err: "Too many games being played" });
+    let peopleAheadOfMe = queue.length;
+
+    const listener = () => {
+        if (peopleAheadOfMe-- > 0) {
+            callback({queue: peopleAheadOfMe})
         }
+    };
 
-        gamePath = path.join(runningGamesPath, `Game${existing}`);
-    } catch (err) {
-        callback({ err: "Failed to read the running games directory" });
-    }
+    const gameID = Date.now();
+
+    callback({gameID});
+
+    callback({queue: peopleAheadOfMe})
+
+    onDequeue.on("dequeue", listener);
+
+
+    enqueue(playGame, [mySnake, opponentSnake, callback, listener], gameID);
+};
+
+const playGame = async (gamePath, mySnake, opponentSnake, callback, listener) => {
     try {
-
+        onDequeue.removeListener("dequeue", listener);
         fse.copySync(snakeCodePath, gamePath);
 
         const mySnakePath = path.join(gamePath, "snake1");
@@ -236,16 +246,14 @@ const playGame = async (s1ID, s2ID, requireS1Owner, callback) => {
         await runCommand(`cd ${gamePath} && javac logic/Program.java`);
 
         const output = await runCommand(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==./snake.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${gamePath} logic.Program ${GRID_WIDTH} ${GRID_HEIGHT} ${SNAKE_MOVE_MAX_MILLIS} ${MAX_ROUNDS}`);
-
+        
         callback(output);
 
     } catch (err) {
+        console.error(err);
         callback({ err });
-    } finally {
-        fs.rmSync(gamePath, { recursive: true, force: true });
     }
-
-};
+}
 
 const socketHandlers = (socket) => {
     socket.on("snake/play", async (data, token) => {
@@ -261,9 +269,19 @@ const socketHandlers = (socket) => {
         }
 
         const { myId, opponentId } = data;
-
-        playGame(myId, opponentId, userData, (response) => {
-            socket.emit("snake/play", response);
+        let cancelled = false;
+        submitGame(myId, opponentId, userData, (response) => {
+            if (cancelled) {
+                return;
+            }
+            if (response.gameID) {
+                socket.once("snake/cancel", () => {
+                    removeFromQueue(response.gameID);
+                    cancelled = true;
+                });
+            } else {
+                socket.emit("snake/play", response);
+            }
         });
 
     })

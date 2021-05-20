@@ -83,6 +83,7 @@ export class SnakeGridComponent implements OnInit, AfterViewInit {
       return;
     }
     if (!game) {
+      this.clearGrid();
       return;
     }
     try {

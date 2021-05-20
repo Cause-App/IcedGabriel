@@ -13,6 +13,8 @@ export class SnakePlayerComponent implements OnInit {
 
   public snakes: Snake[] = [];
 
+  queue: number = -1;
+
   myId: string = "";
   opponentId: string = "";
   @Input() getPlayerId: () => string | undefined | null = () => undefined;
@@ -33,8 +35,14 @@ export class SnakePlayerComponent implements OnInit {
     })
   }
 
-  async play() {
-    const handleResponse = (response: any) => {
+  cancel() {
+    this.api.websocket("snake/cancel", { }, () => {});
+    this.queue = -1;
+  }
+
+  play() {
+    this.gameString = "";
+    this.api.websocket("snake/play", { myId: this.myId, opponentId: this.opponentId }, (response: any) => {
       if (response.err) {
         console.error(response.err);
         this.consoleService.log("Below are the errors thrown by the Java compiler. Note that some of the errors may be for your own code, and some may be for your opponent's code. Errors in files in the directory './snake1' are for your own code, and those in './snake2' are for your opponent's.\n\n");
@@ -44,17 +52,17 @@ export class SnakePlayerComponent implements OnInit {
         if (response.err.stderr) {
           this.consoleService.log(response.err.stderr);
         }
+        this.queue = -1;
         this.warnings.setWarning("failedToCompile", true);
+      } else if (response.hasOwnProperty("queue")) {
+        this.queue = response.queue;
       } else if (response.stdout) {
+        this.queue = -1;
         this.gameString = response.stdout;
       } else {
+        this.queue = -1;
         this.warnings.setWarning("invalidGame", true);
-      }  
-    }
-    try {
-      this.api.websocket("snake/play", { myId: this.myId, opponentId: this.opponentId }, handleResponse);
-    } catch {
-      handleResponse({ err: "Could not connect to server" });
-    }
+      }
+    });
   }
 }
