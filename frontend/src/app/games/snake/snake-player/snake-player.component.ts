@@ -51,8 +51,10 @@ export class SnakePlayerComponent implements OnInit {
         this.consoleService.log(response.err.stderr);
       }
       this.warnings.setWarning("failedToCompile", true);
-    } else {
+    } else if (response.stdout) {
       this.gameString = response.stdout;
+    } else {
+      this.warnings.setWarning("invalidGame", true);
     }
   }
 }
