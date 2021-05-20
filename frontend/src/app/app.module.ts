@@ -5,6 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {NgcCookieConsentModule, NgcCookieConsentConfig} from 'ngx-cookieconsent';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -21,6 +22,8 @@ import { WarningsComponent } from './widgets/warnings/warnings.component';
 import { SnakePlayerComponent } from './games/snake/snake-player/snake-player.component';
 import { SnakeGridComponent } from './games/snake/snake-player/snake-grid/snake-grid.component';
 import { ConsoleComponent } from './widgets/console/console.component';
+
+const socketConfig: SocketIoConfig = { url: '/', options: {} };
 
 const cookieConfig:NgcCookieConsentConfig = {
   cookie: {
@@ -62,7 +65,8 @@ const cookieConfig:NgcCookieConsentConfig = {
     FontAwesomeModule,
     AngularSplitModule,
     DragulaModule.forRoot(),
-    NgcCookieConsentModule.forRoot(cookieConfig)
+    NgcCookieConsentModule.forRoot(cookieConfig),
+    SocketIoModule.forRoot(socketConfig)
   ],
   providers: [],
   bootstrap: [AppComponent]

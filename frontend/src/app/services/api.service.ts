@@ -1,13 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { OAuthService } from 'angular-oauth2-oidc';
+import { Socket } from 'ngx-socket-io';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
 
-  constructor(private http: HttpClient, private oauthService: OAuthService) { }
+  constructor(private http: HttpClient, private oauthService: OAuthService, private socket: Socket) { }
 
   public get(endpoint: string, params: any): Promise<object> {
     let args = "";
@@ -23,4 +24,10 @@ export class ApiService {
     const url = `/api/${endpoint}`;
     return this.http.post(url, {...params, token: this.oauthService.getIdToken()}).toPromise();
   }
+
+  public websocket(endpoint: string, params: any, callback: (result: object) => void): void {
+    this.socket.emit(endpoint, params, this.oauthService.getIdToken());
+    this.socket.on(endpoint, callback);
+  }
+
 }

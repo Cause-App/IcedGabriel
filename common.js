@@ -7,13 +7,7 @@ const MongoClient = require("mongodb").MongoClient;
 const mongoClient = new MongoClient(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = { client: mongoClient };
 
-const requireLogin = async (req, res, next) => {
-    if (!req.query?.token && !req.body?.token) {
-        res.sendStatus(401);
-        return;
-    }
-    const token = req.query.token || req.body.token;
-
+const validateToken = async (token) => {
     try {
         const ticket = await client.verifyIdToken({
             idToken: token,
@@ -26,14 +20,29 @@ const requireLogin = async (req, res, next) => {
             res.sendStatus(401);
             return;
         }
-        req.userid = payload["sub"];
-        req.name = payload["name"];
-        next();
+        return payload;
     } catch (err) {
         console.log(err);
+        return null;
+    }
+}
+
+const requireLogin = async (req, res, next) => {
+    if (!req.query?.token && !req.body?.token) {
         res.sendStatus(401);
         return;
     }
+    const token = req.query.token || req.body.token;
+
+    const payload = await validateToken(token);
+
+    if (payload) {
+        req.userid = payload["sub"];
+        req.name = payload["name"];
+        next();
+    } else {
+        res.sendStatus(401);
+    }
 };
 
-module.exports = { db, requireLogin };
+module.exports = { db, requireLogin, validateToken };

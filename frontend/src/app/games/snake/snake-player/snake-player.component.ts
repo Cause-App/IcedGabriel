@@ -34,27 +34,27 @@ export class SnakePlayerComponent implements OnInit {
   }
 
   async play() {
-    let response: any;
-    try {
-      response = await this.api.get("snake/play", { myId: this.myId, opponentId: this.opponentId });
-    } catch {
-      response = { err: "Could not connect to server" };
+    const handleResponse = (response: any) => {
+      if (response.err) {
+        console.error(response.err);
+        this.consoleService.log("Below are the errors thrown by the Java compiler. Note that some of the errors may be for your own code, and some may be for your opponent's code. Errors in files in the directory './snake1' are for your own code, and those in './snake2' are for your opponent's.\n\n");
+        if (response.err.stdout) {
+          this.consoleService.log(response.err.stdout);
+        }
+        if (response.err.stderr) {
+          this.consoleService.log(response.err.stderr);
+        }
+        this.warnings.setWarning("failedToCompile", true);
+      } else if (response.stdout) {
+        this.gameString = response.stdout;
+      } else {
+        this.warnings.setWarning("invalidGame", true);
+      }  
     }
-
-    if (response.err) {
-      console.error(response.err);
-      this.consoleService.log("Below are the errors thrown by the Java compiler. Note that some of the errors may be for your own code, and some may be for your opponent's code. Errors in files in the directory './snake1' are for your own code, and those in './snake2' are for your opponent's.\n\n");
-      if (response.err.stdout) {
-        this.consoleService.log(response.err.stdout);
-      }
-      if (response.err.stderr) {
-        this.consoleService.log(response.err.stderr);
-      }
-      this.warnings.setWarning("failedToCompile", true);
-    } else if (response.stdout) {
-      this.gameString = response.stdout;
-    } else {
-      this.warnings.setWarning("invalidGame", true);
+    try {
+      this.api.websocket("snake/play", { myId: this.myId, opponentId: this.opponentId }, handleResponse);
+    } catch {
+      handleResponse({ err: "Could not connect to server" });
     }
   }
 }

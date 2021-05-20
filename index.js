@@ -2,6 +2,8 @@
 
 const express = require("express");
 const app = express();
+const http = require("http").createServer(app);
+const io = require("socket.io")(http);
 const fs = require("fs");
 require("dotenv").config();
 
@@ -24,7 +26,8 @@ app.use(express.urlencoded({ extended: true }));
 
 const router = express.Router();
 
-router.use("/api/snake", require("./games/snake"));
+const {snakeRouter, snakeSocketHandlers} = require("./games/snake");
+router.use("/api/snake", snakeRouter);
 
 app.use(router);
 
@@ -54,7 +57,11 @@ db.client.connect(function(err) {
 
     db.db = db.client.db("icedgabriel");
 
-    app.listen(port, () => {
+    http.listen(port, () => {
         console.log(`Listening on port ${port}`)
-    });    
+    });
+
+    io.on("connection", (socket) => {
+        snakeSocketHandlers(socket);
+    });
 });

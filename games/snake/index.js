@@ -1,5 +1,5 @@
 const express = require("express");
-const { db, requireLogin } = require("../../common");
+const { db, requireLogin, validateToken } = require("../../common");
 const fs = require("fs");
 const fse = require("fs-extra");
 const { exec } = require('child_process');
@@ -184,26 +184,22 @@ router.get("/deletesnake", requireLogin, (req, res) => {
     }
 });
 
-router.get("/play", requireLogin, async (req, res) => {
+const playGame = async (s1ID, s2ID, requireS1Owner, callback) => {
     const snakeCollection = db.db.collection("snake");
 
-    if (!req.query.myId || !req.query.opponentId) {
-        res.json({ err: "Snake IDs not provided" });
-        return;
+    const s1Query = { _id: mongo.ObjectId(s1ID) };
+    if (requireS1Owner) {
+        s1Query.owner = requireS1Owner.sub;
     }
 
-    const { myId, opponentId } = req.query;
-
-    const mySnake = await snakeCollection.findOne({ owner: req.userid, _id: mongo.ObjectId(myId) });
+    const mySnake = await snakeCollection.findOne(s1Query);
     if (!mySnake) {
-        res.json({ err: "Your snake does not exist or you do not own it" });
-        return;
+        callback({ err: "Your snake does not exist or you do not own it" });
     }
 
-    const opponentSnake = await snakeCollection.findOne({ _id: mongo.ObjectId(opponentId) });
+    const opponentSnake = await snakeCollection.findOne({ _id: mongo.ObjectId(s2ID) });
     if (!opponentSnake) {
-        res.json({ err: "Your opponent's snake does not exist" });
-        return;
+        callback({ err: "Your opponent's snake does not exist" });
     }
 
     let gamePath;
@@ -211,14 +207,12 @@ router.get("/play", requireLogin, async (req, res) => {
         const existing = fs.readdirSync(runningGamesPath).length;
         if (existing >= MAX_GAMES) {
             // TODO replace with a queue system
-            res.json({ err: "Too many games being played" });
-            return;
+            callback({ err: "Too many games being played" });
         }
 
         gamePath = path.join(runningGamesPath, `Game${existing}`);
     } catch (err) {
-        res.json({ err: "Failed to read the running games directory" });
-        return;
+        callback({ err: "Failed to read the running games directory" });
     }
     try {
 
@@ -243,14 +237,36 @@ router.get("/play", requireLogin, async (req, res) => {
 
         const output = await runCommand(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==./snake.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${gamePath} logic.Program ${GRID_WIDTH} ${GRID_HEIGHT} ${SNAKE_MOVE_MAX_MILLIS} ${MAX_ROUNDS}`);
 
-        res.json(output);
+        callback(output);
 
     } catch (err) {
-        res.json({ err });
+        callback({ err });
     } finally {
         fs.rmSync(gamePath, { recursive: true, force: true });
     }
 
-});
+};
 
-module.exports = router;
+const socketHandlers = (socket) => {
+    socket.on("snake/play", async (data, token) => {
+        const userData = await validateToken(token);
+        if (!userData) {
+            socket.emit("snake/play", { err: "Access Denied" });
+            return;
+        }
+
+        if (!data.myId || !data.opponentId) {
+            socket.emit("snake/play", { err: "Snake IDs not provided" });
+            return;
+        }
+
+        const { myId, opponentId } = data;
+
+        playGame(myId, opponentId, userData, (response) => {
+            socket.emit("snake/play", response);
+        });
+
+    })
+};
+
+module.exports = { snakeRouter: router, snakeSocketHandlers: socketHandlers };
