@@ -135,7 +135,9 @@ export class IdeComponent implements OnInit, AfterViewInit {
     }
     target.value = this.incrementDuplicateFilenames(sanitizedFilename);
     this.codeFiles[i].filename = target.value;
-    this.editSessions[i].setMode(`ace/mode/${languageFromFilename(target.value)}`);
+    const lang = languageFromFilename(target.value);
+    this.editSessions[i].setMode(`ace/mode/${lang}`);
+    this.editSessions[i].setOption("firstLineNumber", lang === "java" ? 2 : 1);
     this.onFilesChange.emit(this.codeFiles);
   }
 
@@ -166,7 +168,9 @@ export class IdeComponent implements OnInit, AfterViewInit {
       this.aceEditor = ace.edit(this.editor.nativeElement);
       for (const codeFile of this.codeFiles) {
         const session = this.makeSession(codeFile.code);
-        session.setMode(`ace/mode/${languageFromFilename(codeFile.filename)}`);
+        const lang = languageFromFilename(codeFile.filename);
+        session.setMode(`ace/mode/${lang}`);
+        session.setOption("firstLineNumber", lang === "java" ? 2 : 1);
         this.editSessions.push(session);
       }
       while (this.editSessions.length <= this.selectedSession) {
@@ -179,9 +183,16 @@ export class IdeComponent implements OnInit, AfterViewInit {
         enableBasicAutocompletion: true,
         enableSnippets: true,
         enableLiveAutocompletion: false,
-        mergeUndoDeltas: true,
-        firstLineNumber: 2
+        mergeUndoDeltas: true
       });
+
+      this.aceEditor.setOptions({
+        enableBasicAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: false,
+        mergeUndoDeltas: true
+      });
+
 
       this.aceEditor.commands.addCommand({
         name: "undo",
@@ -235,8 +246,12 @@ export class IdeComponent implements OnInit, AfterViewInit {
         text: "Reset to default",
         click: () => {
           this.editSessions[i].setValue(this.defaultCodeFiles[i].code);
-          this.editSessions[i].setMode(`ace/mode/${languageFromFilename(this.defaultCodeFiles[i].filename)}`);
-          this.displayingContextMenu = false;
+          const lang = languageFromFilename(this.defaultCodeFiles[i].filename);
+          this.editSessions[i].setMode(`ace/mode/${lang}`);
+          if (lang === "java") {
+            this.editSessions[i].setOption("firstLineNumber", lang === "java" ? 2 : 1);
+          }
+            this.displayingContextMenu = false;
           this.onFilesChange.emit(this.codeFiles);
         }
       });
