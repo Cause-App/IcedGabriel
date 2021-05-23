@@ -3,6 +3,11 @@ import { Injectable } from '@angular/core';
 import { OAuthService } from 'angular-oauth2-oidc';
 import { Socket } from 'ngx-socket-io';
 
+export interface Listener {
+  endpoint: string;
+  callback: any;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -25,9 +30,14 @@ export class ApiService {
     return this.http.post(url, {...params, token: this.oauthService.getIdToken()}).toPromise();
   }
 
-  public websocket(endpoint: string, params: any, callback: (result: object) => void): void {
+  public websocket(endpoint: string, params: any, callback: (result: any) => void): Listener {
     this.socket.emit(endpoint, params, this.oauthService.getIdToken());
     this.socket.on(endpoint, callback);
+    return {endpoint, callback};
+  }
+
+  public removeCallback(listener: Listener) {
+    this.socket.removeListener(listener.endpoint, listener.callback);
   }
 
 }

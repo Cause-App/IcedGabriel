@@ -13,6 +13,9 @@
 <div class="warning failed-to-delete" [ngStyle]="{top: getTop('failedToDelete')}" [ngClass]="{hidden: !warnings.includes('failedToDelete'), depressed:depressed['failedToDelete']}" (click)="depressed['failedToDelete']=!depressed['failedToDelete']">
     <span>We were unable to delete this for you.</span>
 </div>
+<div class="warning failed-to-rank" [ngStyle]="{top: getTop('failedToRank')}" [ngClass]="{hidden: !warnings.includes('failedToRank'), depressed:depressed['failedToRank']}" (click)="depressed['failedToRank']=!depressed['failedToRank']">
+    <span>We were unable to submit this to the leaderboard.</span>
+</div>
 <div class="warning save" [ngStyle]="{top: getTop('save')}" [ngClass]="{hidden: !warnings.includes('save'), depressed:depressed['save']}" (click)="depressed['save']=!depressed['save']">
     <span>Saved changes</span>
 </div>

@@ -10,6 +10,7 @@ export interface Snake {
   code: CodeFile[];
   owner?: string;
   ownerName?: string;
+  rank?: number;
 }
 
 const DEFAULT_SNAKE_NAME = "An unnamed snake";
@@ -25,12 +26,19 @@ export class SnakeOptionsComponent implements OnInit {
   }
 
   snakes: Snake[] = [];
-  private snakesById: { [key: string]: Snake } = {};
+  snakesById: { [key: string]: Snake } = {};
 
   pickingOtherSnake = false;
 
   snakeName: string = DEFAULT_SNAKE_NAME;
   snakeID: string | undefined | null;
+
+  ranking: boolean = false;
+  rankStart: number = 0;
+  rankEnd: number = 0;
+  snakeCount: number = -1;
+  rankQueue: number = -1;
+  cancellable: boolean = true;
 
   @Input() getFiles: () => CodeFile[] = () => { return [] };
   @Input() onFilesLoaded: (files: CodeFile[]) => void = () => { };
@@ -157,6 +165,74 @@ export class SnakeOptionsComponent implements OnInit {
       this.snakeID = this.snakes.length ? this.snakes[0]._id : undefined;
       this.snakeUpdated();
     }
+  }
+
+  rankSnake() {
+    this.ranking = true;
+    this.rankStart = 0;
+    this.rankEnd = 0;
+    this.snakeCount = -1;
+    this.rankQueue = -1;
+    const snakeToRank = this.snakeID;
+    this.cancellable = true;
+    if (!snakeToRank) {
+      return;
+    }
+    const currentRank = this.snakesById[snakeToRank].rank;
+    const listener = this.api.websocket("snake/rank", { myId: snakeToRank }, (response) => {
+      if (response.err) {
+        this.warnings.setWarning("failedToRank", true);
+        this.ranking = false;
+      }
+      if (response.hasOwnProperty("queue")) {
+        this.rankQueue = response.queue;
+      }
+      if (response.hasOwnProperty("start")) {
+        this.rankStart = response.start;
+        this.rankEnd = response.end;
+        if (this.snakeCount < 0) {
+          this.snakeCount = response.end + 1;
+          if (currentRank !== undefined) {
+            this.snakeCount++;
+          }
+        }
+        if (currentRank !== undefined && currentRank < this.rankStart) {
+          this.rankStart++;
+        }
+
+        if (currentRank !== undefined && currentRank <= this.rankEnd+1) {
+          this.rankEnd++;
+        }
+      }
+      if (response.cancel) {
+        this.api.removeCallback(listener);
+      }
+      if (response.hasOwnProperty("rank")) {
+        this.snakesById[snakeToRank].rank = response.rank;
+        this.api.removeCallback(listener);
+        this.rankStart = response.rank;
+        this.rankEnd = response.rank;
+        this.cancellable = false;
+        setTimeout(() => {
+          this.ranking = false;
+        }, 1000);
+      }
+    });
+  }
+
+  rankSliderStyle(): any {
+    const l = this.rankStart/this.snakeCount;
+    const r = (this.rankEnd+1)/this.snakeCount;
+    const elim = "#003333";
+    const active = "#ff0000";
+    return {
+      "background-image": `linear-gradient(to right, ${elim} 0%, ${elim} ${l * 100}%, ${active} ${l * 100}%, ${active} ${r * 100}%, ${elim} ${r * 100}%, ${elim} 100%)`
+    }
+  }
+
+  cancelRank() {
+    this.api.websocket("snake/cancelrank", {}, () => {});
+    this.ranking = false;
   }
 
 }

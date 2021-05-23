@@ -46,3 +46,19 @@ input[type="text"] {
         background-color: rgb(151, 29, 29);
     }
 }
+
+.rank {
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    text-align: center;
+
+    .rank-slider {
+        border: 1px solid black;
+        width: max(400px, 90%);
+        height: 50px;
+    }
+}
+

@@ -22,8 +22,9 @@ const snakeCodePath = "./GameCode/Snake";
 
 const GRID_WIDTH = 16;
 const GRID_HEIGHT = 16;
-const SNAKE_MOVE_MAX_MILLIS = 200;
-const MAX_ROUNDS = 1000;
+const SNAKE_MOVE_MAX_MILLIS = 50;
+const MAX_ROUNDS = 500;
+const NUMBER_OF_RANKED_GAMES = 32;
 
 const router = express.Router();
 
@@ -45,12 +46,19 @@ const runCommand = (command) => {
 
 router.get("/getsnakes", requireLogin, (req, res) => {
     const snakeCollection = db.db.collection("snake");
+    const snakeLbCollection = db.db.collection("snakeleaderboard");
 
-    snakeCollection.find({ owner: req.userid }).toArray((err, docs) => {
+    snakeCollection.find({ owner: req.userid }).toArray(async (err, docs) => {
         if (err) {
             console.err(err);
             res.json([]);
             return;
+        }
+        for (const doc of docs) {
+            const rank = await snakeLbCollection.findOne({_id: mongo.ObjectId(doc._id)});
+            if (rank) {
+                doc.rank = rank.rank;
+            }
         }
         res.json(docs);
     });
@@ -183,8 +191,9 @@ router.get("/deletesnake", requireLogin, (req, res) => {
     }
 });
 
-const submitGame = async (s1ID, s2ID, requireS1Owner, callback) => {
+const submitGame = async (s1ID, s2ID, requireS1Owner, collection, callback) => {
     const snakeCollection = db.db.collection("snake");
+    const opponentSnakeCollection = collection ?? snakeCollection
 
     const s1Query = { _id: mongo.ObjectId(s1ID) };
     if (requireS1Owner) {
@@ -197,7 +206,7 @@ const submitGame = async (s1ID, s2ID, requireS1Owner, callback) => {
         return;
     }
 
-    const opponentSnake = await snakeCollection.findOne({ _id: mongo.ObjectId(s2ID) });
+    const opponentSnake = await opponentSnakeCollection.findOne({ _id: mongo.ObjectId(s2ID) });
     if (!opponentSnake) {
         callback({ err: "Your opponent's snake does not exist" });
         return;
@@ -207,23 +216,23 @@ const submitGame = async (s1ID, s2ID, requireS1Owner, callback) => {
 
     const listener = () => {
         if (peopleAheadOfMe-- > 0) {
-            callback({queue: peopleAheadOfMe})
+            callback({ queue: peopleAheadOfMe })
         }
     };
 
     const gameID = Date.now();
 
-    callback({gameID});
+    callback({ gameID });
 
-    callback({queue: peopleAheadOfMe})
+    callback({ queue: peopleAheadOfMe })
 
     onDequeue.on("dequeue", listener);
 
 
-    enqueue(playGame, [mySnake, opponentSnake, callback, listener], gameID);
+    enqueue(playGame, [mySnake, opponentSnake, callback, listener, !!collection], gameID);
 };
 
-const playGame = async (gamePath, mySnake, opponentSnake, callback, listener) => {
+const playGame = async (gamePath, mySnake, opponentSnake, callback, listener, ranked) => {
     try {
         onDequeue.removeListener("dequeue", listener);
         fse.copySync(snakeCodePath, gamePath);
@@ -245,8 +254,8 @@ const playGame = async (gamePath, mySnake, opponentSnake, callback, listener) =>
 
         await runCommand(`cd ${gamePath} && javac logic/Program.java`);
 
-        const output = await runCommand(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==./snake.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${gamePath} logic.Program ${GRID_WIDTH} ${GRID_HEIGHT} ${SNAKE_MOVE_MAX_MILLIS} ${MAX_ROUNDS}`);
-        
+        const output = await runCommand(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==./snake.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${gamePath} logic.Program ${GRID_WIDTH} ${GRID_HEIGHT} ${SNAKE_MOVE_MAX_MILLIS} ${MAX_ROUNDS} ${ranked ? NUMBER_OF_RANKED_GAMES : -1}`);
+
         callback(output);
 
     } catch (err) {
@@ -270,7 +279,7 @@ const socketHandlers = (socket) => {
 
         const { myId, opponentId } = data;
         let cancelled = false;
-        submitGame(myId, opponentId, userData, (response) => {
+        submitGame(myId, opponentId, userData, null, (response) => {
             if (cancelled) {
                 return;
             }
@@ -284,7 +293,101 @@ const socketHandlers = (socket) => {
             }
         });
 
-    })
+    });
+
+    socket.on("snake/rank", async (data, token) => {
+        const userData = await validateToken(token);
+        if (!userData) {
+            socket.emit("snake/rank", { err: "Access Denied" });
+            return;
+        }
+
+        if (!data.myId) {
+            socket.emit("snake/rank", { err: "Snake ID not provided" });
+            return;
+        }
+
+        const { myId } = data;
+
+        const snakeCollection = db.db.collection("snake");
+        const snakeLbCollection = db.db.collection("snakeleaderboard");
+
+        const mySnake = await snakeCollection.findOne({ _id: mongo.ObjectId(myId), owner: userData.sub });
+        if (!mySnake) {
+            socket.emit("snake/rank", { err: "Your snake does not exist or you do not own it" });
+            return;
+        }
+
+        const snakeCount = (await snakeLbCollection.find({_id: {$ne: mongo.ObjectId(myId)}}).count());
+
+        const insertAt = async (n) => {
+            const currentRank = (await snakeLbCollection.findOne({_id: mongo.ObjectId(myId)}))?.rank;
+            const session = db.client.startSession();
+
+            try {
+                await session.withTransaction(async () => {
+                    if (currentRank !== undefined) {
+                        await snakeLbCollection.deleteOne({ _id: mongo.ObjectId(myId) });
+                        await snakeLbCollection.updateMany({ rank: { $gt: currentRank } }, { $inc: { rank: -1 } });
+                    }
+                    await snakeLbCollection.updateMany({ rank: { $gte: n } }, { $inc: { rank: 1 } });
+                    await snakeLbCollection.insertOne({_id: mongo.ObjectId(myId), owner: mySnake.owner, code: mySnake.code, name: mySnake.name, rank: n});
+                    
+                    socket.emit("snake/rank", {rank: n});    
+                });
+            } catch (err) {
+                console.error(err);
+                socket.emit("snake/rank", {err});
+            } finally {
+                await session.endSession();
+            }
+        }
+
+        let cancelled = false;
+        let gameID = null;
+
+        const doRound = (start, end) => {
+            if (start > end) {
+                insertAt(start);
+                return
+            }
+            socket.emit("snake/rank", {start, end});
+            const opponentIndex = Math.floor((start + end) / 2);
+            snakeLbCollection.find({_id: {$ne: mongo.ObjectId(myId)}}).sort({ rank: 1 }).skip(opponentIndex).limit(1).forEach((opponentSnake) => {
+                submitGame(myId, opponentSnake._id, userData, snakeLbCollection, (response) => {
+                    if (cancelled) {
+                        return;
+                    }
+                    if (!response.stdout) {
+                        if (response.gameID) {
+                            gameID = response.gameID;
+                        } else {
+                            socket.emit("snake/rank", response);
+                        }
+                        return;
+                    }
+                    const [wins, losses, draws] = response.stdout.split(",").map(x => +x);
+                    if (wins > losses) {
+                        doRound(start, opponentIndex-1);
+                    } else if (wins < losses) {
+                        doRound(opponentIndex+1, end);
+                    } else {
+                        insertAt(opponentIndex);
+                    }
+                });
+            });
+        }
+
+        doRound(0, snakeCount-1);
+
+        socket.once("snake/cancelrank", () => {
+            cancelled = true;
+            if (gameID) {
+                removeFromQueue(gameID);
+            }
+            socket.emit("snake/rank", {cancel: true});
+        })
+    });
 };
 
 module.exports = { snakeRouter: router, snakeSocketHandlers: socketHandlers };

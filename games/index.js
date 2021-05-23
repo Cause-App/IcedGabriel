@@ -3,7 +3,7 @@ const path = require("path");
 const runningGamesPath = "./RunningGames";
 const EventEmitter = require("events");
 
-const MAX_GAMES = 5;
+const MAX_GAMES = 16;
 
 let queue = [];
 const onDequeue = new EventEmitter();

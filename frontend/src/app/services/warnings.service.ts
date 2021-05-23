@@ -1,9 +1,10 @@
 import { EventEmitter, Injectable } from '@angular/core';
 
 
-export type warning = "unsavedChanges" | "failedToCompile" | "invalidGame" | "failedToDelete" | "save";
+export type warning = "unsavedChanges" | "failedToCompile" | "failedToRank" | "invalidGame" | "failedToDelete" | "save";
 const temporaryWarnings: {[key: string]: number} = {
   "failedToCompile": 3000,
+  "failedToRank": 3000,
   "invalidGame": 3000,
   "failedToDelete": 3000,
   "save": 1000
