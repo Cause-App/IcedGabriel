@@ -245,14 +245,16 @@ export class IdeComponent implements OnInit, AfterViewInit {
       this.contextMenuItems.push({
         text: "Reset to default",
         click: () => {
-          this.editSessions[i].setValue(this.defaultCodeFiles[i].code);
-          const lang = languageFromFilename(this.defaultCodeFiles[i].filename);
-          this.editSessions[i].setMode(`ace/mode/${lang}`);
-          if (lang === "java") {
-            this.editSessions[i].setOption("firstLineNumber", lang === "java" ? 2 : 1);
+          if (confirm("Are you sure you want to do this? This action cannot be undone, and you will lose whatever code is in this file.")) {
+            this.editSessions[i].setValue(this.defaultCodeFiles[i].code);
+            const lang = languageFromFilename(this.defaultCodeFiles[i].filename);
+            this.editSessions[i].setMode(`ace/mode/${lang}`);
+            if (lang === "java") {
+              this.editSessions[i].setOption("firstLineNumber", lang === "java" ? 2 : 1);
+            }
+              this.displayingContextMenu = false;
+            this.onFilesChange.emit(this.codeFiles);
           }
-            this.displayingContextMenu = false;
-          this.onFilesChange.emit(this.codeFiles);
         }
       });
     } else {
@@ -266,13 +268,15 @@ export class IdeComponent implements OnInit, AfterViewInit {
       this.contextMenuItems.push({
         text: "Delete",
         click: () => {
-          this.codeFiles.splice(i, 1);
-          this.editSessions.splice(i, 1);
-          if (i === this.selectedSession) {
-            this.selectedSession--;
+          if (confirm("Are you sure you want to do this? This action cannot be undone, and you will lose whatever code is in this file.")) {
+            this.codeFiles.splice(i, 1);
+            this.editSessions.splice(i, 1);
+            if (i === this.selectedSession) {
+              this.selectedSession--;
+            }
+            this.displayingContextMenu = false;
+            this.onFilesChange.emit(this.codeFiles);
           }
-          this.displayingContextMenu = false;
-          this.onFilesChange.emit(this.codeFiles);
         }
       });
     }
