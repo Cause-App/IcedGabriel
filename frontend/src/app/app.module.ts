@@ -2,9 +2,9 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { OAuthModule } from 'angular-oauth2-oidc';
+import { OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {NgcCookieConsentModule, NgcCookieConsentConfig} from 'ngx-cookieconsent';
+import { NgcCookieConsentModule, NgcCookieConsentConfig } from 'ngx-cookieconsent';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -26,7 +26,7 @@ import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component'
 
 const socketConfig: SocketIoConfig = { url: '/', options: {} };
 
-const cookieConfig:NgcCookieConsentConfig = {
+const cookieConfig: NgcCookieConsentConfig = {
   cookie: {
     domain: 'localhost'
   },
@@ -41,6 +41,10 @@ const cookieConfig:NgcCookieConsentConfig = {
   theme: 'classic',
   type: 'info'
 };
+
+export function storageFactory(): OAuthStorage {
+  return localStorage
+}
 
 @NgModule({
   declarations: [
@@ -70,7 +74,9 @@ const cookieConfig:NgcCookieConsentConfig = {
     NgcCookieConsentModule.forRoot(cookieConfig),
     SocketIoModule.forRoot(socketConfig)
   ],
-  providers: [],
+  providers: [
+    { provide: OAuthStorage, useFactory: storageFactory }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

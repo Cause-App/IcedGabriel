@@ -65,6 +65,8 @@ button {
     border: 0.01em solid black;
     background-color: #a9f1df;
     border-radius: 0.2em;
+    text-decoration: none;
+    color: black;
 
     &:not(:disabled) {
         &:hover {

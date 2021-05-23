@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { ApiService } from 'src/app/services/api.service';
 import { Game, GameListService } from 'src/app/services/game-list.service';
 import { UserDataService } from 'src/app/services/user-data.service';
@@ -24,6 +25,8 @@ export class LeaderboardComponent implements OnInit {
   public leaderboard: LeaderboardEntry[] = [];
 
   public myID: string = "";
+
+  faArrowLeft = faArrowLeft;
 
   constructor(private route: ActivatedRoute, public gameList: GameListService, private router: Router, private api: ApiService, private user: UserDataService) { }
 
