@@ -6,6 +6,7 @@ import { OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgcCookieConsentModule, NgcCookieConsentConfig } from 'ngx-cookieconsent';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+import { AutocompleteLibModule } from 'angular-ng-autocomplete';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -72,7 +73,8 @@ export function storageFactory(): OAuthStorage {
     AngularSplitModule,
     DragulaModule.forRoot(),
     NgcCookieConsentModule.forRoot(cookieConfig),
-    SocketIoModule.forRoot(socketConfig)
+    SocketIoModule.forRoot(socketConfig),
+    AutocompleteLibModule
   ],
   providers: [
     { provide: OAuthStorage, useFactory: storageFactory }

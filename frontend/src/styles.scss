@@ -11,7 +11,8 @@ body {
     color: #e3fff8;
 }
 
-body, input[type="text"] {
+body,
+input[type="text"] {
     font-family: "Roboto", sans-serif;
 }
 
@@ -23,10 +24,18 @@ body, input[type="text"] {
     }
 }
 
-input[type="text"] {
-    background-color: #616161;
-    color: white;
-    border: 0.1em solid #414141;
+input[type="text"],
+select,
+.autocomplete-container .suggestions-container ul li a,
+.autocomplete-container .not-found {
+    font-size: 1em !important;
+    background-color: #616161 !important;
+    color: white !important;
+    border: 0.1em solid #414141 !important;
+}
+
+.autocomplete-container .not-found div {
+    border: none!important;
 }
 
 button,
@@ -88,6 +97,32 @@ button {
 
     img {
         height: 1.5em;
+    }
+}
+
+.button3 {
+    background-color: #b4aee8;
+    border: 1px solid darkblue;
+    padding: 0.3em 0;
+
+    &.selected {
+        background-color: #a9f1df;
+
+        &:hover {
+            background-color: #8ce6cf;
+        }
+
+        &:active {
+            background-color: #6bcfb5;
+        }
+    }
+
+    &:hover {
+        background-color: #938dc9;
+    }
+
+    &:active {
+        background-color: #726ca8;
     }
 }
 

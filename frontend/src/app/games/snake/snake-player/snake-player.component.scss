@@ -15,6 +15,7 @@
     align-items: center;
     justify-content: flex-start;
     flex-direction: column;
+    margin: -1em 0 1em 0;
 }
 
 select {
@@ -26,11 +27,39 @@ select {
     text-align: center;
 }
 
-.queue, .cancel {
+.queue,
+.cancel {
     margin-top: 1em;
 }
 
 .lb {
     margin: 0.2em 0.2em auto auto;
     font-size: 0.7em;
+}
+
+.choice {
+    .options {
+        text-align: center;
+        font-size: 0.7em;
+        button {
+            width: 7em;
+        }
+
+    }
+
+    .selector {
+        margin-top: 1em;
+        &, select, option {
+            text-align: center;
+        }
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-direction: column;
+    }
+}
+
+.ng-autocomplete {
+    font-size: 0.8em;
+    width: max(300px, 80%)!important;
 }

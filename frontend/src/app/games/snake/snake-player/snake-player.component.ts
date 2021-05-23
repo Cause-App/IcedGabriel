@@ -4,6 +4,8 @@ import { ConsoleService } from 'src/app/services/console.service';
 import { WarningsService } from 'src/app/services/warnings.service';
 import { Snake } from '../snake-options/snake-options.component';
 
+type opponentSelectMethod = "mine" | "leaderboard" | "search";
+
 @Component({
   selector: 'app-snake-player',
   templateUrl: './snake-player.component.html',
@@ -11,7 +13,8 @@ import { Snake } from '../snake-options/snake-options.component';
 })
 export class SnakePlayerComponent implements OnInit {
 
-  public snakes: Snake[] = [];
+  public mySnakes: Snake[] = [];
+  public leaderboard: Snake[] = [];
 
   queue: number = -1;
 
@@ -22,12 +25,55 @@ export class SnakePlayerComponent implements OnInit {
 
   public gameString: string = "";
 
+  public osm: opponentSelectMethod = "mine";
+
+  switchOSM(x: opponentSelectMethod) {
+    this.osm = x;
+    if (x === "mine") {
+      this.opponentId = this.mySnakes[0]._id;
+    } else if (x === "leaderboard") {
+      this.opponentId = this.leaderboard[0]._id;
+    } else if (x === "search") {
+      this.opponentId = "";
+    }
+  }
+
+  searchKeyword = 'name&dev';
+  searched = "";
+  allSnakes: any[] = [];
+
+  selectEvent(item: any) {
+    setTimeout(() => {
+      this.opponentId = item._id;
+      console.log(this.opponentId);
+    }, 0);
+  }
+
+  searchTermChanged() {
+    for (const s of this.allSnakes) {
+      if (s["name&dev"] === this.searched) {
+        this.selectEvent(s);
+        return;
+      }
+    }
+    this.opponentId = "";
+  }
+
   constructor(private api: ApiService, private warnings: WarningsService, public consoleService: ConsoleService) { }
 
   async ngOnInit(): Promise<void> {
-    const response: any = await this.api.get("snake/getAllSnakes", {});
-    this.snakes = response;
-    this.opponentId = this.snakes[0]._id;
+    const response: any = await this.api.get("snake/mine", {});
+    this.mySnakes = response;
+    this.opponentId = this.mySnakes[0]._id;
+
+    const lbResponse: any = await this.api.get("snake/leaderboard", {});
+    this.leaderboard = lbResponse;
+
+    const allResponse: any = await this.api.get("snake/getAllSnakes", {});
+    this.allSnakes = allResponse;
+    for (const snake of this.allSnakes) {
+      snake["name&dev"] = `${snake.name} by ${snake.ownerName}`;
+    }
 
     this.myId = this.getPlayerId() ?? "";
     this.playerIdChanged?.subscribe(() => {
@@ -36,11 +82,14 @@ export class SnakePlayerComponent implements OnInit {
   }
 
   cancel() {
-    this.api.websocket("snake/cancel", { }, () => {});
+    this.api.websocket("snake/cancel", {}, () => { });
     this.queue = -1;
   }
 
   play() {
+    if (!this.opponentId) {
+      return;
+    }
     this.gameString = "";
     this.api.websocket("snake/play", { myId: this.myId, opponentId: this.opponentId }, (response: any) => {
       if (response.err) {
