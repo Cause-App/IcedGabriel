@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit } from '@angular/core';
 import { ApiService } from 'src/app/services/api.service';
 import { WarningsService } from 'src/app/services/warnings.service';
 import { CodeFile, GameListService } from 'src/app/services/game-list.service';

@@ -2,8 +2,10 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input
 import { CodeFile, Game } from 'src/app/services/game-list.service';
 import * as ace from "ace-builds";
 import 'ace-builds/src-noconflict/ext-language_tools';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { ContextMenuItem } from 'src/app/widgets/context-menu/context-menu.component';
+import * as JSZip from 'jszip';
+import { saveAs } from '@progress/kendo-file-saver';
 
 const languageOfExtension: { [key: string]: string } = {
   "java": "java",
@@ -42,6 +44,8 @@ export class IdeComponent implements OnInit, AfterViewInit {
   private contextMenuX: number = -1;
   private contextMenuY: number = -1;
   public contextMenuItems: ContextMenuItem[] = [];
+
+  faDownload = faDownload;
 
   @Output() onFilesChange: EventEmitter<CodeFile[]> = new EventEmitter<CodeFile[]>();
 
@@ -290,6 +294,17 @@ export class IdeComponent implements OnInit, AfterViewInit {
       left: `${this.contextMenuX}px`,
       top: `${this.contextMenuY}px`
     }
+  }
+
+  download(): void {
+    const zip = new JSZip();
+    for (const file of this.codeFiles) {
+      zip.file(file.filename, file.code);
+    }
+
+    zip.generateAsync({type: "blob"}).then((content) => {
+      saveAs(content, "code.zip");
+    })
   }
 
   @HostListener("document:click", ["$event.target"])

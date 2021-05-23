@@ -40,3 +40,13 @@ $toolbar-height: 50px;
     width: 100%;
     height: calc(100% - #{$toolbar-height});
 }
+
+.download {
+    cursor: pointer;
+    margin: 0 1em;
+    transition: transform 0.5s ease;
+
+    &:hover {
+        transform: scale(1.5);
+    }
+}
