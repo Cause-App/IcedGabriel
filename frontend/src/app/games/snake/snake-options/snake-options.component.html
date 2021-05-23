@@ -1,26 +1,27 @@
 <div class="snake-name">
-    <label *ngIf="!pickingOtherSnake" >
-        <span>Name:</span> 
-        <input [(ngModel)]="snakeName" maxlength="32" type="text" placeholder="Snake Name" value="My Snake" (ngModelChange)="save()">
-        <span *ngIf="snakeID && (!!snakesById[snakeID].rank || snakesById[snakeID].rank === 0)">{{snakesById[snakeID].rank}}</span>
+    <label *ngIf="renamingSnake">
+        <input [(ngModel)]="snakeName" maxlength="32" type="text" placeholder="Snake Name" value="My Snake"
+            (ngModelChange)="save()" (blur)="renamingSnake=false" (keyup.enter)="renamingSnake=false">
+        <span
+            *ngIf="snakeID && (!!snakesById[snakeID].rank || snakesById[snakeID].rank === 0)">{{snakesById[snakeID].rank}}</span>
     </label>
-    <label *ngIf="pickingOtherSnake">
-        <span>My Snakes:</span> 
+    <label *ngIf="!renamingSnake">
+        <span>My Snakes:</span>
         <select [(ngModel)]="snakeID" (ngModelChange)="snakeUpdated()">
             <option *ngFor="let snake of snakes" [value]="snake._id">{{snake.name}}</option>
             <option [value]="undefined">New Snake</option>
-        </select>        
+        </select>
     </label>
 </div>
 <div class="buttons">
-    <button class="button1" *ngIf="!pickingOtherSnake" (click)="pickingOtherSnake=true">Pick A Different Snake</button>
-    <button class="button1 delete" *ngIf="!pickingOtherSnake" (click)="deleteSnake()">Delete This Snake</button>
-    <button class="button1" *ngIf="!pickingOtherSnake" (click)="rankSnake()">Submit to Leaderboard</button>
-    <button class="button1" *ngIf="pickingOtherSnake" (click)="pickingOtherSnake=false">Play As This Snake</button>    
+    <button class="button1" *ngIf="!renamingSnake" (click)="renamingSnake=true">Rename Snake</button>
+    <button class="button1 delete" *ngIf="!renamingSnake" (click)="deleteSnake()">Delete This Snake</button>
+    <button class="button1" *ngIf="!renamingSnake" (click)="rankSnake()">Submit to Leaderboard</button>
 </div>
 <div *ngIf="ranking" class="rank">
     <div>Calculating your place in the leaderboard</div>
     <div class="rank-slider" [ngStyle]="rankSliderStyle()"></div>
-    <div class="queue" *ngIf="rankQueue >= 0">There {{rankQueue === 1? 'is': 'are'}} {{rankQueue}} {{rankQueue === 1? 'game': 'games'}} ahead of you in the game queue</div>
+    <div class="queue" *ngIf="rankQueue >= 0">There {{rankQueue === 1? 'is': 'are'}} {{rankQueue}} {{rankQueue === 1?
+        'game': 'games'}} ahead of you in the game queue</div>
     <button *ngIf="cancellable" class="button1" (click)="cancelRank()">Cancel</button>
 </div>

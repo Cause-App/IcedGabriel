@@ -28,7 +28,7 @@ export class SnakeOptionsComponent implements OnInit {
   snakes: Snake[] = [];
   snakesById: { [key: string]: Snake } = {};
 
-  pickingOtherSnake = false;
+  renamingSnake = false;
 
   snakeName: string = DEFAULT_SNAKE_NAME;
   snakeID: string | undefined | null;
