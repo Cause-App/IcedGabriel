@@ -33,12 +33,15 @@ export class SnakeOptionsComponent implements OnInit {
   snakeName: string = DEFAULT_SNAKE_NAME;
   snakeID: string | undefined | null;
 
+  leaderboardSize: number = 0;
+
   ranking: boolean = false;
   rankStart: number = 0;
   rankEnd: number = 0;
   snakeCount: number = -1;
   rankQueue: number = -1;
   cancellable: boolean = true;
+  rankResult = -1;
 
   @Input() getFiles: () => CodeFile[] = () => { return [] };
   @Input() onFilesLoaded: (files: CodeFile[]) => void = () => { };
@@ -173,13 +176,14 @@ export class SnakeOptionsComponent implements OnInit {
     this.rankEnd = 0;
     this.snakeCount = -1;
     this.rankQueue = -1;
+    this.rankResult = -1;
     const snakeToRank = this.snakeID;
     this.cancellable = true;
     if (!snakeToRank) {
       return;
     }
     const currentRank = this.snakesById[snakeToRank].rank;
-    const listener = this.api.websocket("snake/rank", { myId: snakeToRank }, (response) => {
+    const listener = this.api.websocket("snake/rank", { myId: snakeToRank }, async (response) => {
       if (response.err) {
         this.warnings.setWarning("failedToRank", true);
         this.ranking = false;
@@ -212,10 +216,20 @@ export class SnakeOptionsComponent implements OnInit {
         this.api.removeCallback(listener);
         this.rankStart = response.rank;
         this.rankEnd = response.rank;
+        this.rankQueue = -1;
         this.cancellable = false;
+        const leaderboard: any = await this.api.get("snake/leaderboard", {});
+        this.leaderboardSize = leaderboard.length;
+        let i;
+        for (i=0; i<leaderboard.length; i++) {
+          if (leaderboard[i].rank > response.rank) {
+            break;
+          }
+        }
+        this.rankResult = i;
         setTimeout(() => {
           this.ranking = false;
-        }, 1000);
+        }, 3000);
       }
     });
   }
@@ -235,4 +249,13 @@ export class SnakeOptionsComponent implements OnInit {
     this.ranking = false;
   }
 
+  suffix(x: number): string {
+    switch (x % 10) {
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
+      default: return "th";
+    }
+  }
+ 
 }
