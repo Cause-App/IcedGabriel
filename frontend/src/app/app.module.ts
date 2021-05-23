@@ -1,7 +1,7 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { OAuthModule, OAuthStorage } from 'angular-oauth2-oidc';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgcCookieConsentModule, NgcCookieConsentConfig } from 'ngx-cookieconsent';
@@ -28,7 +28,7 @@ const socketConfig: SocketIoConfig = { url: '/', options: {} };
 
 const cookieConfig: NgcCookieConsentConfig = {
   cookie: {
-    domain: 'not-set'
+    domain: 'icedgabriel.herokuapp.com'
   },
   palette: {
     popup: {
@@ -41,10 +41,6 @@ const cookieConfig: NgcCookieConsentConfig = {
   theme: 'classic',
   type: 'info',
 };
-
-export function cookieConfigFactory(http: HttpClient, config: NgcCookieConsentConfig,) {
-  return () => config.cookie.domain = window.location.href;
-}
 
 export function storageFactory(): OAuthStorage {
   return localStorage
@@ -79,8 +75,7 @@ export function storageFactory(): OAuthStorage {
     SocketIoModule.forRoot(socketConfig)
   ],
   providers: [
-    { provide: OAuthStorage, useFactory: storageFactory },
-    { provide: APP_INITIALIZER, useFactory: cookieConfigFactory, deps: [HttpClient, NgcCookieConsentConfig], multi: true }
+    { provide: OAuthStorage, useFactory: storageFactory }
   ],
   bootstrap: [AppComponent]
 })
