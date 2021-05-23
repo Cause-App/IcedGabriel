@@ -6,6 +6,7 @@ import { faDownload, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { ContextMenuItem } from 'src/app/widgets/context-menu/context-menu.component';
 import * as JSZip from 'jszip';
 import { saveAs } from '@progress/kendo-file-saver';
+import { WarningsService } from 'src/app/services/warnings.service';
 
 const languageOfExtension: { [key: string]: string } = {
   "java": "java",
@@ -148,7 +149,13 @@ export class IdeComponent implements OnInit, AfterViewInit {
   @ViewChild("editor") private editor?: ElementRef;
   @ViewChildren('filenameinput') filenameInputs?: QueryList<ElementRef>
 
-  constructor() { }
+  public saveMessage: boolean = false;
+
+  constructor(private warningsService: WarningsService) {
+    warningsService.onChange.subscribe((w) => {
+      this.saveMessage = w.includes("save");
+    })
+  }
 
   ngOnInit(): void {
     this.defaultCodeFiles = this.game?.defaultCode || [];

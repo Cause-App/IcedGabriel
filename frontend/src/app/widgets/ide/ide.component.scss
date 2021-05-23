@@ -50,3 +50,13 @@ $toolbar-height: 50px;
         transform: scale(1.5);
     }
 }
+
+.save {
+    text-align: center;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+
+    &.hidden {
+        opacity: 0;
+    }
+}

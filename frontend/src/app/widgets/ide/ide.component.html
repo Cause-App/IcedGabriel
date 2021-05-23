@@ -8,6 +8,9 @@
             <input maxlength="32" #filenameinput type="text" [disabled]="editingFilename!==i" (change)="updateLanguage(i, $event)" (keyup.enter)="editingFilename=null" (blur)="editingFilename=null" placeholder="filename" [value]="file.filename">
         </div>
     </div>
+    <div class="save" [ngClass]="{hidden: !saveMessage}">
+        Changes saved
+    </div>
     <div class="download">
         <fa-icon [icon]="faDownload" (click)="download()"></fa-icon>
     </div>
