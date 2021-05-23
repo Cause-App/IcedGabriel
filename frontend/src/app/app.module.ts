@@ -28,7 +28,7 @@ const socketConfig: SocketIoConfig = { url: '/', options: {} };
 
 const cookieConfig: NgcCookieConsentConfig = {
   cookie: {
-    domain: 'icedgabriel.herokuapp.com'
+    domain: window.location.hostname
   },
   palette: {
     popup: {
