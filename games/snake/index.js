@@ -67,7 +67,7 @@ router.get("/getsnakes", requireLogin, (req, res) => {
 router.get("/getallsnakes", requireLogin, (req, res) => {
     const snakeCollection = db.db.collection("snake");
 
-    snakeCollection.find().toArray((err, docs) => {
+    snakeCollection.find().project({ code: false }).toArray((err, docs) => {
         if (err) {
             console.err(err);
             res.json([]);
