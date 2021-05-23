@@ -2,8 +2,6 @@
     <label *ngIf="renamingSnake">
         <input [(ngModel)]="snakeName" maxlength="32" type="text" placeholder="Snake Name" value="My Snake"
             (ngModelChange)="save()" (blur)="renamingSnake=false" (keyup.enter)="renamingSnake=false">
-        <span
-            *ngIf="snakeID && (!!snakesById[snakeID].rank || snakesById[snakeID].rank === 0)">{{snakesById[snakeID].rank}}</span>
     </label>
     <label *ngIf="!renamingSnake">
         <span>My Snakes:</span>

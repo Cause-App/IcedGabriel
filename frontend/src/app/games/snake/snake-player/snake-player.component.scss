@@ -3,6 +3,7 @@
     align-items: center;
     justify-content: flex-start;
     flex-direction: column;
+    padding-bottom: 3em;
 }
 
 .hidden {
@@ -15,7 +16,7 @@
     align-items: center;
     justify-content: flex-start;
     flex-direction: column;
-    margin: -1em 0 1em 0;
+    margin: -2em 0 1em 0;
 }
 
 select {
@@ -36,6 +37,7 @@ select {
     margin: 0.2em 0.2em auto auto;
     font-size: 0.7em;
     z-index: 1;
+    color: gold;
 }
 
 .choice {

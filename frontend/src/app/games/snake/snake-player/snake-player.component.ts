@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit } from '@angular/core';
+import { faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { ApiService } from 'src/app/services/api.service';
 import { ConsoleService } from 'src/app/services/console.service';
 import { WarningsService } from 'src/app/services/warnings.service';
@@ -17,6 +18,8 @@ export class SnakePlayerComponent implements OnInit {
   public leaderboard: Snake[] = [];
 
   queue: number = -1;
+
+  faTrophy = faTrophy;
 
   myId: string = "";
   opponentId: string = "";
