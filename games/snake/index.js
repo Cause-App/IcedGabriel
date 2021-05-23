@@ -44,21 +44,24 @@ const runCommand = (command) => {
     });
 }
 
-router.get("/getsnakes", requireLogin, (req, res) => {
-    const snakeCollection = db.db.collection("snake");
+router.get("/leaderboard", async (req, res) => {
     const snakeLbCollection = db.db.collection("snakeleaderboard");
+    const result = await snakeLbCollection.aggregate([
+        { $sort: { 'rank': 1 } },
+        { $group: { _id: '$owner', group: { $first: '$$ROOT' } } },
+        { $replaceRoot: { newRoot: "$group" } }
+    ]).project({code: false}).toArray();
+    res.json(result);
+});
+
+router.get("/mine", requireLogin, (req, res) => {
+    let snakeCollection = req.query.leaderboard ? db.db.collection("snakeleaderboard") : db.db.collection("snake");
 
     snakeCollection.find({ owner: req.userid }).toArray(async (err, docs) => {
         if (err) {
             console.err(err);
             res.json([]);
             return;
-        }
-        for (const doc of docs) {
-            const rank = await snakeLbCollection.findOne({_id: mongo.ObjectId(doc._id)});
-            if (rank) {
-                doc.rank = rank.rank;
-            }
         }
         res.json(docs);
     });
@@ -318,10 +321,10 @@ const socketHandlers = (socket) => {
             return;
         }
 
-        const snakeCount = (await snakeLbCollection.find({_id: {$ne: mongo.ObjectId(myId)}}).count());
+        const snakeCount = (await snakeLbCollection.find({ _id: { $ne: mongo.ObjectId(myId) } }).count());
 
         const insertAt = async (n) => {
-            const currentRank = (await snakeLbCollection.findOne({_id: mongo.ObjectId(myId)}))?.rank;
+            const currentRank = (await snakeLbCollection.findOne({ _id: mongo.ObjectId(myId) }))?.rank;
             const session = db.client.startSession();
 
             try {
@@ -331,13 +334,13 @@ const socketHandlers = (socket) => {
                         await snakeLbCollection.updateMany({ rank: { $gt: currentRank } }, { $inc: { rank: -1 } });
                     }
                     await snakeLbCollection.updateMany({ rank: { $gte: n } }, { $inc: { rank: 1 } });
-                    await snakeLbCollection.insertOne({_id: mongo.ObjectId(myId), owner: mySnake.owner, code: mySnake.code, name: mySnake.name, rank: n});
-                    
-                    socket.emit("snake/rank", {rank: n});    
+                    await snakeLbCollection.insertOne({ _id: mongo.ObjectId(myId), owner: mySnake.owner, ownerName: mySnake.ownerName, code: mySnake.code, name: mySnake.name, rank: n });
+
+                    socket.emit("snake/rank", { rank: n });
                 });
             } catch (err) {
                 console.error(err);
-                socket.emit("snake/rank", {err});
+                socket.emit("snake/rank", { err });
             } finally {
                 await session.endSession();
             }
@@ -351,9 +354,9 @@ const socketHandlers = (socket) => {
                 insertAt(start);
                 return
             }
-            socket.emit("snake/rank", {start, end});
+            socket.emit("snake/rank", { start, end });
             const opponentIndex = Math.floor((start + end) / 2);
-            snakeLbCollection.find({_id: {$ne: mongo.ObjectId(myId)}}).sort({ rank: 1 }).skip(opponentIndex).limit(1).forEach((opponentSnake) => {
+            snakeLbCollection.find({ _id: { $ne: mongo.ObjectId(myId) } }).sort({ rank: 1 }).skip(opponentIndex).limit(1).forEach((opponentSnake) => {
                 submitGame(myId, opponentSnake._id, userData, snakeLbCollection, (response) => {
                     if (cancelled) {
                         return;
@@ -368,9 +371,9 @@ const socketHandlers = (socket) => {
                     }
                     const [wins, losses, draws] = response.stdout.split(",").map(x => +x);
                     if (wins > losses) {
-                        doRound(start, opponentIndex-1);
+                        doRound(start, opponentIndex - 1);
                     } else if (wins < losses) {
-                        doRound(opponentIndex+1, end);
+                        doRound(opponentIndex + 1, end);
                     } else {
                         insertAt(opponentIndex);
                     }
@@ -378,14 +381,14 @@ const socketHandlers = (socket) => {
             });
         }
 
-        doRound(0, snakeCount-1);
+        doRound(0, snakeCount - 1);
 
         socket.once("snake/cancelrank", () => {
             cancelled = true;
             if (gameID) {
                 removeFromQueue(gameID);
             }
-            socket.emit("snake/rank", {cancel: true});
+            socket.emit("snake/rank", { cancel: true });
         })
     });
 };

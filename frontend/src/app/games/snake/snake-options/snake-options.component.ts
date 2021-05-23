@@ -124,7 +124,7 @@ export class SnakeOptionsComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    const snakes: any = await this.api.get("snake/getsnakes", {});
+    const snakes: any = await this.api.get("snake/mine", {});
     this.snakes = snakes;
     for (const snake of this.snakes) {
       this.snakesById[snake._id] = snake;

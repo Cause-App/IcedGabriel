@@ -1,0 +1,40 @@
+.content {
+    width: 100%;
+    min-height: 100%;
+    background-color: black;
+    padding: 10px;
+
+    table {
+        margin: 30px auto;
+        
+        th {
+            border-bottom: 1px solid white;
+        }
+
+        th, td {
+            padding: 0.2em 1em;
+        }
+
+        .mine {
+            td {
+                background-color: #590000;
+            }
+        }
+
+        .first td {
+            background-color: goldenrod;
+            color: black;
+        }
+
+        .second td {
+            background-color: silver;
+            color: black;
+        }
+
+        .third td {
+            background-color: darkorange;
+            color: black;
+        }
+    }
+}
+

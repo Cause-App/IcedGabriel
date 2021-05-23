@@ -1,0 +1,18 @@
+<div class="content">
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Developer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let entry of leaderboard" [ngClass]="{mine: entry.owner === myID, first: entry.index === 0, second: entry.index === 1, third: entry.index === 2}">
+                <td>{{entry.index >= 0 ? entry.index : ""}}</td>
+                <td>{{entry.name}}</td>
+                <td>{{entry.ownerName}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

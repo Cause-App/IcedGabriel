@@ -22,6 +22,7 @@ import { WarningsComponent } from './widgets/warnings/warnings.component';
 import { SnakePlayerComponent } from './games/snake/snake-player/snake-player.component';
 import { SnakeGridComponent } from './games/snake/snake-player/snake-grid/snake-grid.component';
 import { ConsoleComponent } from './widgets/console/console.component';
+import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component';
 
 const socketConfig: SocketIoConfig = { url: '/', options: {} };
 
@@ -54,7 +55,8 @@ const cookieConfig:NgcCookieConsentConfig = {
     WarningsComponent,
     SnakePlayerComponent,
     SnakeGridComponent,
-    ConsoleComponent
+    ConsoleComponent,
+    LeaderboardComponent
   ],
   imports: [
     BrowserModule,
