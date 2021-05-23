@@ -28,10 +28,10 @@ $toolbar-height: 50px;
 
     .file {
         &.selected {
-            background-color: #141414;
+            background-color: #141414!important;
         }
         &:hover:not(:active):not(.selected) {
-            background-color: #343434;
+            background-color: #343434!important;
         }
     }
 }
