@@ -1,15 +1,18 @@
-<h1>
-    IcedGabriel
-    <img src="/assets/logo.png" height="50px">
-</h1>
-<p>Unofficial University of Cambridge programming challenges</p>
-<div *ngIf="user.loggedIn">
-    <p>Pick a game to get started</p>
-    <div class="games">
-        <button class="button2" *ngFor="let game of gameList.games" [disabled]="!game.available" (click)="gameList.goTo(game)">
-            {{game.name}}
-        </button>
+<app-snake-preview></app-snake-preview>
+<div class="info">
+    <h1>
+        IcedGabriel
+        <img src="/assets/logo.png" height="50px">
+    </h1>
+    <p>Unofficial University of Cambridge programming challenges</p>
+    <div *ngIf="user.loggedIn">
+        <p>Pick a game to get started</p>
+        <div class="games">
+            <button class="button2" *ngFor="let game of gameList.games" [disabled]="!game.available" (click)="gameList.goTo(game)">
+                {{game.name}}
+            </button>
+        </div>
     </div>
+    <p *ngIf="!user.loggedIn">Log in with Raven to get started</p>
+    <app-log-in-out-button *ngIf="!user.loggedIn"></app-log-in-out-button>    
 </div>
-<p *ngIf="!user.loggedIn">Log in with Raven to get started</p>
-<app-log-in-out-button *ngIf="!user.loggedIn"></app-log-in-out-button>

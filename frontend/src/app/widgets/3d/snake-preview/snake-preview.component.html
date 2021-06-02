@@ -1,0 +1,26 @@
+<div class="floor" [style]="'--grid-width: '+width+'; --grid-height: '+height">
+    <div *ngFor="let s1Pos of s1Trail" class="cube" [style]="'--x: '+s1Pos[0]+'; --y: '+s1Pos[1]+'; --color: red'">
+        <div class="front"></div>
+        <div class="back"></div>
+        <div class="bottom"></div>
+        <div class="left"></div>
+        <div class="right"></div>
+        <div class="top"></div>
+    </div>
+    <div *ngFor="let s2Pos of s2Trail" class="cube" [style]="'--x: '+s2Pos[0]+'; --y: '+s2Pos[1]+'; --color: blue'">
+        <div class="front"></div>
+        <div class="back"></div>
+        <div class="bottom"></div>
+        <div class="left"></div>
+        <div class="right"></div>
+        <div class="top"></div>
+    </div>
+    <div class="cube" [style]="'--x: '+ax+'; --y: '+ay+'; --color: green'">
+        <div class="front"></div>
+        <div class="back"></div>
+        <div class="bottom"></div>
+        <div class="left"></div>
+        <div class="right"></div>
+        <div class="top"></div>
+    </div>
+</div>

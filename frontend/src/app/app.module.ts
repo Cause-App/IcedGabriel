@@ -24,6 +24,7 @@ import { SnakePlayerComponent } from './games/snake/snake-player/snake-player.co
 import { SnakeGridComponent } from './games/snake/snake-player/snake-grid/snake-grid.component';
 import { ConsoleComponent } from './widgets/console/console.component';
 import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component';
+import { SnakePreviewComponent } from './widgets/3d/snake-preview/snake-preview.component';
 
 const socketConfig: SocketIoConfig = { url: '/', options: {} };
 
@@ -61,7 +62,8 @@ export function storageFactory(): OAuthStorage {
     SnakePlayerComponent,
     SnakeGridComponent,
     ConsoleComponent,
-    LeaderboardComponent
+    LeaderboardComponent,
+    SnakePreviewComponent
   ],
   imports: [
     BrowserModule,

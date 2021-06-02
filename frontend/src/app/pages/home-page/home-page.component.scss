@@ -1,11 +1,22 @@
 :host {
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: flex-start;
     flex-direction: column;
-    background-color: #21094e;
-    height: 100%;
+}
+
+.info {
+    margin-top: 1em;
+    padding: 1em;
+    border-radius: 2em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
     text-align: center;
+    position: relative;
+    background-color: #21094ea0;
 }
 
 h1 {
@@ -68,4 +79,10 @@ h1 {
             }
         }
     }
+}
+
+app-snake-preview {
+    position: absolute;
+    top: 0;
+    left: 0;
 }
