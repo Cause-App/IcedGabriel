@@ -9,6 +9,7 @@
 .info {
     margin-top: 1em;
     padding: 1em;
+    padding-top: 0;
     border-radius: 2em;
     display: inline-flex;
     align-items: center;
@@ -85,4 +86,5 @@ app-snake-preview {
     position: absolute;
     top: 0;
     left: 0;
+    z-index: -1;
 }
