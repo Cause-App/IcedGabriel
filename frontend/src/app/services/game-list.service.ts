@@ -110,7 +110,7 @@ public class UnoPlayer implements UnoPlayerInterface {
     if (!game.available) {
       return;
     }
-    this.router.navigate(["game", game.id]);
+    window.location.href = "/game/"+game.id;
   }
 
   gameWithID(id: string): Game | undefined {
