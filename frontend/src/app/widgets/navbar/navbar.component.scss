@@ -40,18 +40,22 @@
         top: 100%;
         left: 0;
         min-width: 100%;
-        background-color: #a9f1df;
+        background-color: black;
         display: flex;
         align-items: flex-start;
         justify-content: flex-start;
         flex-direction: column;
         border: 0.04em solid #1eae98;
-        color: black;
-        padding: 0.5em 1em;
         cursor: default;
         > * {
             margin: 0.2em 0;
             white-space: nowrap;
+
+            &:not(:last-child) {
+                border-bottom: 1px solid #1eae98;
+            }
+            width: 100%;
+            padding: 0.5em 1em;
 
             &:not(.coming-soon) .name {
                 font-weight: bold;
@@ -60,6 +64,7 @@
                 display: inline-block;
                 &:hover {
                     transform: scale(1.1);
+                    color: #1eae98;
                 }
             }
 

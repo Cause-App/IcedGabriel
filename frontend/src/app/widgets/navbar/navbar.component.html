@@ -4,12 +4,12 @@
     Games
     <fa-icon [icon]="faChevronDown"></fa-icon>
     <div class="content">
-        <span *ngFor="let game of gameList.games" [ngClass]="{'coming-soon': !game.available}" (click)="gameList.goTo(game)">
+        <div *ngFor="let game of gameList.games" [ngClass]="{'coming-soon': !game.available}" (click)="gameList.goTo(game)">
             <span class="name">{{game.name}}</span>
             <span class="note" *ngIf="!game.available">
                 Coming soon!
             </span>
-        </span>
+        </div>
     </div>
 </span>
 <app-log-in-out-button></app-log-in-out-button>
