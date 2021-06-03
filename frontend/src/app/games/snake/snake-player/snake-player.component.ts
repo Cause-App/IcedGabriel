@@ -25,6 +25,7 @@ export class SnakePlayerComponent implements OnInit {
   opponentId: string = "";
   @Input() getPlayerId: () => string | undefined | null = () => undefined;
   @Input() playerIdChanged?: EventEmitter<void>;
+  @Input() reloadOpponents?: EventEmitter<void>;
 
   public gameString: string = "";
 
@@ -62,9 +63,7 @@ export class SnakePlayerComponent implements OnInit {
     this.opponentId = "";
   }
 
-  constructor(private api: ApiService, private warnings: WarningsService, public consoleService: ConsoleService) { }
-
-  async ngOnInit(): Promise<void> {
+  async loadOpponents() {
     const response: any = await this.api.get("snake/mine", {});
     this.mySnakes = response;
     this.opponentId = this.mySnakes[0]._id;
@@ -77,6 +76,14 @@ export class SnakePlayerComponent implements OnInit {
     for (const snake of this.allSnakes) {
       snake["name&dev"] = `${snake.name} by ${snake.ownerName}`;
     }
+  }
+
+  constructor(private api: ApiService, private warnings: WarningsService, public consoleService: ConsoleService) { }
+
+  async ngOnInit(): Promise<void> {
+
+    await this.loadOpponents();
+    this.reloadOpponents?.subscribe(this.loadOpponents.bind(this));
 
     this.myId = this.getPlayerId() ?? "";
     this.playerIdChanged?.subscribe(() => {

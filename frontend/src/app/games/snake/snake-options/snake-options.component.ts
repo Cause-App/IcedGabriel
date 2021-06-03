@@ -227,6 +227,7 @@ export class SnakeOptionsComponent implements OnInit {
           }
         }
         this.rankResult = i;
+        this.onChangesMade(false);
         setTimeout(() => {
           this.ranking = false;
         }, 3000);

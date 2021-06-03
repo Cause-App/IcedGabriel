@@ -15,6 +15,7 @@ export class GameComponent implements OnInit, AfterViewInit, ChangeableComponent
   public changesMade: boolean = false;
 
   codeChanged: EventEmitter<void> = new EventEmitter<void>();
+  reloadOpponents: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(private route: ActivatedRoute, public gameList: GameListService, private router: Router, private resolver: ComponentFactoryResolver) {
   }
@@ -67,6 +68,7 @@ export class GameComponent implements OnInit, AfterViewInit, ChangeableComponent
         reference.instance.onIdChanged = this.onPlayerIdChange.bind(this);
         reference.instance.onChangesMade = (x: boolean) => {
           this.changesMade = x;
+          this.reloadOpponents.emit();
         }
       }
       if (this.playerContainer) {
@@ -75,6 +77,7 @@ export class GameComponent implements OnInit, AfterViewInit, ChangeableComponent
         const reference: any = this.playerContainer.createComponent(factory);
         reference.instance.getPlayerId = this.getPlayerId.bind(this);
         reference.instance.playerIdChanged = this.playerIdChanged;
+        reference.instance.reloadOpponents = this.reloadOpponents;
       }
     }
   }

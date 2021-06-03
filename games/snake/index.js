@@ -50,7 +50,7 @@ router.get("/leaderboard", async (req, res) => {
         { $sort: { 'rank': 1 } },
         { $group: { _id: '$owner', group: { $first: '$$ROOT' } } },
         { $replaceRoot: { newRoot: "$group" } }
-    ]).project({code: false}).toArray();
+    ]).project({code: false}).sort({"rank": 1}).toArray();
     res.json(result);
 });
 
@@ -275,6 +275,7 @@ const playGame = async (gamePath, mySnake, opponentSnake, callback, listener, ra
 }
 
 const socketHandlers = (socket) => {
+    socket.setMaxListeners(Infinity);
     socket.on("snake/play", async (data, token) => {
         const userData = await validateToken(token);
         if (!userData) {
