@@ -139,8 +139,9 @@ export class SnakeGridComponent implements OnInit, AfterViewInit {
       const handleMove = (cb: (winner: number) => void) => {
         try {
           if (logMessages[round]) {
-            log(logMessages[round++]);
+            log(logMessages[round]);
           }
+          round++;
           if (this.cancelledGame) {
             this.playingGame = false;
             return;

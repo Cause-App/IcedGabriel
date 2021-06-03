@@ -2,6 +2,8 @@
     1 turn/s<input type="range" min="1" max="100" [(ngModel)]="turnsPerSecond">100 turns/s
 </label>
 <div class="container">
+    <canvas #canvas [width]="1024" [height]="1024"></canvas>
 </div>
+<button *ngIf="playingGame && !cancelledGame" class="button1" (click)="cancelledGame=true">Cancel</button>
 <span class="winner" *ngIf="winner">{{winner}}</span>
 <span class="details" *ngIf="details">{{details}}</span>

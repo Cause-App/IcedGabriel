@@ -272,9 +272,6 @@ public class Program {
 				for (Card c: game.s1Hand) {
 					log += ","+c;
 				}
-				for (Card c: game.s2Hand) {
-					log += ","+c;
-				}
 
 				log += ","+ game.lastPlayedCard;
 				log += game.s1Turn ? ",1" : ",2";
@@ -299,9 +296,6 @@ public class Program {
 					log += ","+c;
 				}
 				log += ","+s2Pickup.size();
-				for (Card c: s2Pickup) {
-					log += ","+c;
-				}
 
 				do {
 					game.newRound();
@@ -327,20 +321,20 @@ public class Program {
 
 					if (!game.moveValid()) {
 						if (game.s1Turn) {
-							log += "0,0,0,2";
+							log += ",0,0,"+game.deck.size()+",0,2";
 							loses++;
 						} else {
-							log += "0,0,0,1";
+							log += ",0,0,"+game.deck.size()+",0,1";
 							wins++;
 						}
 					} else {
 						try {
 							game.makeMove();
 							if (game.s1Hand.size() == 0) {
-								log += "0,0,0,1";
+								log += ",0,0,"+game.deck.size()+",0,1";
 								wins++;
 							} else if (game.s2Hand.size() == 0) {
-								log += "0,0,0,2";
+								log += ",0,0,"+game.deck.size()+",0,2";
 								loses++;
 							} else {
 								Card q;
@@ -363,14 +357,12 @@ public class Program {
 									log += ","+c;
 								}
 								log += ","+s2Pickup.size();
-								for (Card c: s2Pickup) {
-									log += ","+c;
-								}
+								log += ","+game.deck.size();
 								log += game.s1Turn ? ",1" : ",2";
 								over = false;
 							}
 						} catch (OutOfCardsException e) {
-							log += ",0,0";
+							log += ",0,0,0,0";
 							draws++;
 						}
 					}
