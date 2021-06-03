@@ -33,32 +33,65 @@ export class SnakePreviewComponent implements OnInit {
     }
   }
 
+  project(x: number, y: number, d: number) {
+    if (d === 0) {
+      return {x, y: (y-1+this.height)%this.height};
+    }
+    if (d === 1) {
+      return {x: (x+1)%this.width, y};
+    }
+    if (d == 2) {
+      return {x, y: (y+1)%this.height};
+    }
+    return {x: (x-1+this.width)%this.width, y};
+  }
+
+  protect(x: number, y: number, d: number) {
+    for (let i=0; i<4; i++) {
+      const p = this.project(x, y, d);
+      const c = this.grid[p.y][p.x];
+      if (c !== "snake1" && c !== "snake2") {
+        return d;
+      }
+      d = i;
+    }
+    return -1;
+  }
+
   calcS1Move(myHeadX: number, myHeadY: number, enemyHeadX: number, enemyHeadY: number, appleX: number, appleY: number): number {
+    let d = -1;
     if (myHeadX > appleX) {
-      return 3;
+      d=3;
     }
-    if (myHeadX < appleX) {
-      return 1;
+    else if (myHeadX < appleX) {
+      d=1;
     }
-    if (myHeadY > appleY) {
-      return 0;
+    else if (myHeadY > appleY) {
+      d=0;
+    } else {
+      d=2;
     }
-    return 2;
+
+    return this.protect(myHeadX, myHeadY, d);
   }
 
   calcS2Move(myHeadX: number, myHeadY: number, enemyHeadX: number, enemyHeadY: number, appleX: number, appleY: number): number {
     let dx = myHeadX-appleX;
     let dy = myHeadY-appleY;
+    let d = -1;
     if (Math.abs(dx) > Math.abs(dy)) {
       if (dx > 0) {
-        return 3;
+        d=3;
+      } else {
+        d=1;
       }
-      return 1;
     }
-    if (dy > 0) {
-      return 0;
+    else if (dy > 0) {
+      d=0;
+    } else {
+      return 2;
     }
-    return 2;
+    return this.protect(myHeadX, myHeadY, d);
   }
 
   getRandomPos() {
