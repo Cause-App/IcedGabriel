@@ -78,12 +78,12 @@ export function storageFactory(): OAuthStorage {
     NgcCookieConsentModule.forRoot(cookieConfig),
     SocketIoModule.forRoot(socketConfig),
     AutocompleteLibModule,
-    AdsenseModule.forRoot({
-      adClient: 'ca-pub-8197932456644504',
-      adSlot: 1177802728,
-      display: "block",
-      fullWidthResponsive: true
-    }),
+    // AdsenseModule.forRoot({
+    //   adClient: 'ca-pub-8197932456644504',
+    //   adSlot: 1177802728,
+    //   display: "block",
+    //   fullWidthResponsive: true
+    // }),
   ],
   providers: [
     { provide: OAuthStorage, useFactory: storageFactory }
