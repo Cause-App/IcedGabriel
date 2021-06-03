@@ -35,6 +35,14 @@
     text-shadow: text-stroke(1px, black);
 }
 
+.logo {
+    position: absolute;
+    top: 10vh;
+    right: 2vw;
+    height: min(200px, min(20vw, 20vh));
+}
+
+
 h1 {
     display: flex;
     align-items: center;
@@ -42,9 +50,6 @@ h1 {
     flex-direction: column;
     > * {
         margin: 0.15em 0;
-    }
-    img {
-        height: 1em;
     }
 }
 
