@@ -36,9 +36,37 @@ export class GameListService {
 import logic.Direction;
 
 public class Snake implements Slitherable {
-  
+        
     public Direction move(int myHeadX, int myHeadY, int enemyHeadX, int enemyHeadY, int appleX, int appleY) {
-        return Direction.LEFT;
+        
+        /*
+            Welcome to CodeSnake!
+
+            You are the red snake. Your opponent is the blue snake. The apple is green.
+            If you collide with the other snake, or your own tail, you lose.
+            The goal is to avoid losing while trying to make your opponent lose (obviously).
+
+            Each round, each player's "move" function is called. It should return either:
+                Direction.UP, Direction.RIGHT, Direction.DOWN, or Direction.LEFT
+            to indicate which way the snake's head should move.
+
+            If you go past the edge, you wrap back around to the opposite edge.
+
+            If you hit the apple, your tail will get longer by one cell.
+
+            Your class attributes will persist from round to round, so feel free to
+            store data from one round to the next.
+
+            There are limitations on how much memory you're allowed to use, and on how
+            much time the "move" method takes to execute.
+
+            If the game goes on for too long, the longest snake wins.
+
+            Good luck!
+        */
+
+        throw new RuntimeException("I do not know how to snake. Please help me."); 
+
     }
   
 }`
