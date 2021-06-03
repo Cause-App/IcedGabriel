@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { WarningsService } from 'src/app/services/warnings.service';
 import { ConsoleService } from 'src/app/services/console.service';
+import * as e from 'cors';
 
 type gridContent = "empty" | "snake1" | "snake2" | "apple" | "collision";
 
@@ -148,8 +149,16 @@ export class SnakeGridComponent implements OnInit, AfterViewInit {
           const d1 = parts[index++];
           const d2 = parts[index++];
           if (d1 === -1 && d2 === -1) {
-            this.details = "Both snakes exploded";
-            cb(0);
+            if (parts[parts.length-1] === 1) {
+              this.details = "You were longer when the game timed out";
+              cb(1);
+            } else if (parts[parts.length-1] === 2) {
+              this.details = "Your opponent was longer when the game timed out";
+              cb(2);
+            } else {
+              this.details = "The game timed out";
+              cb(0);
+            }
           } else if (d1 === -1) {
             this.details = "You exploded";
             cb(2);

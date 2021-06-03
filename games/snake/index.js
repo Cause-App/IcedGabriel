@@ -173,6 +173,7 @@ router.post("/editsnake", requireLogin, (req, res) => {
 
 router.get("/deletesnake", requireLogin, (req, res) => {
     const snakeCollection = db.db.collection("snake");
+    const snakeLbCollection = db.db.collection("snakeleaderboard");
 
     const id = req.query.id && req.query.id !== "undefined" ? req.query.id : undefined;
 
@@ -188,6 +189,13 @@ router.get("/deletesnake", requireLogin, (req, res) => {
                 _id: mongo.ObjectId(id)
             },
         )
+        snakeLbCollection.deleteOne(
+            {
+                owner: req.userid,
+                _id: mongo.ObjectId(id)
+            },
+        )
+
         res.json({});
     } catch (e) {
         res.json({ err: e });
@@ -258,7 +266,6 @@ const playGame = async (gamePath, mySnake, opponentSnake, callback, listener, ra
         await runCommand(`cd ${gamePath} && javac logic/Program.java`);
 
         const output = await runCommand(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==./snake.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${gamePath} logic.Program ${GRID_WIDTH} ${GRID_HEIGHT} ${SNAKE_MOVE_MAX_MILLIS} ${MAX_ROUNDS} ${ranked ? NUMBER_OF_RANKED_GAMES : -1}`);
-
         callback(output);
 
     } catch (err) {

@@ -143,6 +143,15 @@ public class Program {
 			grid.set(t[0], t[1], Grid.Tile.EMPTY);
 		}
 
+		public int whoIsLonger() {
+			if (s1Trail.size() > s2Trail.size()) {
+				return 1;
+			} else if (s1Trail.size() < s2Trail.size()) {
+				return 2;
+			}
+			return 0;
+		}
+
 		public String toString() {
 			return grid.toString();
 		}
@@ -389,8 +398,18 @@ public class Program {
 				} while (!over & ++rounds < MAX_ROUNDS);
 
 				if (!over) {
-					log += ",-1,-1,0";
-					draws++;
+					log += ",-1,-1,";
+					int longer = game.whoIsLonger();
+					if (longer == 1) {
+						log += "1";
+						wins++;
+					} else if (longer == 2) {
+						log += "2";
+						loses++;
+					} else {
+						log += "0";
+						draws++;
+					}
 				}
 				if (!ranked) {
 					System.out.println(log);
