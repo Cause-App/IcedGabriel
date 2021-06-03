@@ -7,6 +7,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgcCookieConsentModule, NgcCookieConsentConfig } from 'ngx-cookieconsent';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { AutocompleteLibModule } from 'angular-ng-autocomplete';
+import { AdsenseModule } from 'ng2-adsense';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -76,7 +77,13 @@ export function storageFactory(): OAuthStorage {
     DragulaModule.forRoot(),
     NgcCookieConsentModule.forRoot(cookieConfig),
     SocketIoModule.forRoot(socketConfig),
-    AutocompleteLibModule
+    AutocompleteLibModule,
+    AdsenseModule.forRoot({
+      adClient: 'ca-pub-8197932456644504',
+      adSlot: 1177802728,
+      display: "block",
+      fullWidthResponsive: true
+    }),
   ],
   providers: [
     { provide: OAuthStorage, useFactory: storageFactory }
