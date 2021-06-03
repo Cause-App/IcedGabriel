@@ -30,7 +30,7 @@ export class GameComponent implements OnInit, AfterViewInit, ChangeableComponent
     this.route.params.subscribe(params => {
       const gameID = params['id'];
       this.game = this.gameList.gameWithID(gameID);
-      if (!this.game) {
+      if (!this.game?.available) {
         this.router.navigate(["/"]);
       }
     });
