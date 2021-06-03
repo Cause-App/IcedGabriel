@@ -6,7 +6,20 @@
     flex-direction: column;
 }
 
+@function text-stroke($width, $color) {
+    $result: "";
+    @for $size from 1 through $width/1px {
+        @for $y from -$size through $size {
+            @for $x from -$size through $size {
+                $result: $result + ""+($x*1px)+" "+($y*1px)+" "+$color+",";
+            }
+        }
+    }
+    @return unquote(str-slice($result, 0, -2));
+}
+
 .info {
+    font-size: 0.7em;
     margin-top: 1em;
     padding: 1em;
     padding-top: 0;
@@ -17,7 +30,9 @@
     flex-direction: column;
     text-align: center;
     position: relative;
-    background-color: #21094ea0;
+    $size: 1px;
+    $color: black;
+    text-shadow: text-stroke(1px, black);
 }
 
 h1 {

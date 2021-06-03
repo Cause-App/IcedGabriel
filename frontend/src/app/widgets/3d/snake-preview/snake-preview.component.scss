@@ -12,7 +12,7 @@
     $cell-fill: #000126;
     $cell-border: 5%;
     $cell-border-reversed: 100% - $cell-border;
-    font-size: 50px;
+    font-size: min(5vw,5vh);
     position: absolute;
     left: 50%;
     bottom: 0;
