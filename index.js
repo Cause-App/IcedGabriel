@@ -27,7 +27,9 @@ app.use(express.urlencoded({ extended: true }));
 const router = express.Router();
 
 const {snakeRouter, snakeSocketHandlers} = require("./games/snake");
+const {unoRouter, unoSocketHandlers} = require("./games/uno");
 router.use("/api/snake", snakeRouter);
+router.use("/api/uno", unoRouter);
 
 app.use(router);
 
@@ -63,5 +65,6 @@ db.client.connect(function(err) {
 
     io.on("connection", (socket) => {
         snakeSocketHandlers(socket);
+        unoSocketHandlers(socket);
     });
 });

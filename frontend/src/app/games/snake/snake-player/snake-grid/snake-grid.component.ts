@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { WarningsService } from 'src/app/services/warnings.service';
 import { ConsoleService } from 'src/app/services/console.service';
-import * as e from 'cors';
 
 type gridContent = "empty" | "snake1" | "snake2" | "apple" | "collision";
 

@@ -1,0 +1,47 @@
+<a class="button4 lb" href="/leaderboard/uno" target="_blank"><fa-icon [icon]="faTrophy"></fa-icon></a>
+<div class="opponent">
+    <p class="heading">Select Opponent</p>
+    <div class="choice">
+        <div class="options">
+            <button class="button3" [ngClass]="{selected: osm==='mine'}" (click)="switchOSM('mine')">My Players</button>
+            <button class="button3" [ngClass]="{selected: osm==='leaderboard'}"
+                (click)="switchOSM('leaderboard')">Leaderboard</button>
+            <button class="button3" [ngClass]="{selected: osm==='search'}" (click)="switchOSM('search')">Search</button>
+        </div>
+        <div class="selector" *ngIf="osm==='mine'">
+            <select [(ngModel)]="opponentId">
+                <option *ngFor="let snake of myPlayers" [value]="snake._id">{{snake.name}}
+                </option>
+            </select>
+        </div>
+        <div class="selector" *ngIf="osm==='leaderboard'">
+            <select [(ngModel)]="opponentId">
+                <option *ngFor="let snake of leaderboard; let i=index" [value]="snake._id">{{i}}. {{snake.name}} by
+                    {{snake.ownerName}}
+                </option>
+            </select>
+        </div>
+        <div class="selector" *ngIf="osm==='search'">
+            <div class="ng-autocomplete">
+                <ng-autocomplete [data]="allPlayers" [searchKeyword]="searchKeyword" (selected)='selectEvent($event)'
+                    [(ngModel)]="searched" [itemTemplate]="itemTemplate" [notFoundTemplate]="notFoundTemplate" (ngModelChange)="searchTermChanged()">
+                </ng-autocomplete>
+
+                <ng-template #itemTemplate let-item>
+                    <a [innerHTML]="item['name&dev']"></a>
+                </ng-template>
+
+                <ng-template #notFoundTemplate let-notFound>
+                    <div [innerHTML]="notFound"></div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>
+<button class="button1" [ngClass]="{hidden: queue >= 0 || !opponentId}" [disabled]="queue >= 0 || !opponentId"
+    (click)="consoleService.clear(); play()">Play</button>
+<app-uno-grid [gameString]="gameString"></app-uno-grid>
+<div class="queue" *ngIf="queue >= 0">There {{queue === 1? 'is': 'are'}} {{queue}} {{queue === 1? 'game': 'games'}}
+    ahead of you in the queue</div>
+<button class="cancel button1" *ngIf="queue > 0" (click)="cancel()">Cancel</button>
+<!-- <ng-adsense></ng-adsense> -->

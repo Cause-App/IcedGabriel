@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { SnakeOptionsComponent } from '../games/snake/snake-options/snake-options.component';
 import { SnakePlayerComponent } from '../games/snake/snake-player/snake-player.component';
+import { UnoOptionsComponent } from '../games/uno/uno-options/uno-options.component';
+import { UnoPlayerComponent } from '../games/uno/uno-player/uno-player.component';
 
 export interface CodeFile {
   filename: string;
@@ -73,7 +75,27 @@ public class Snake implements Slitherable {
         }
       ]
     },
-    { name: "Uno", id: "uno", available: false },
+    { name: "Uno", id: "uno", available: true, optionsComponent: UnoOptionsComponent, playerComponent: UnoPlayerComponent, defaultCode: [
+      {
+        filename: "UnoPlayer.java",
+        protected: true,
+        code: `import logic.UnoPlayerInterface;
+import logic.Card;
+
+public class UnoPlayer implements UnoPlayerInterface {
+
+    @Override
+    public Card playCard(Card lastPlayedCard, Card[] hand) {
+        /*
+            Welcome to Uno!
+        */
+
+        throw new RuntimeException("I forgot how to Uno :(");
+    }
+
+}`
+      }
+    ] },
     { name: "Monopoly", id: "monopoly", available: false },
   ]
 

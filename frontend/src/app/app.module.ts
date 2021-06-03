@@ -20,9 +20,12 @@ import { DragulaModule } from 'ng2-dragula';
 import { ContextMenuComponent } from './widgets/context-menu/context-menu.component';
 import { IdeComponent } from './widgets/ide/ide.component';
 import { SnakeOptionsComponent } from './games/snake/snake-options/snake-options.component';
+import { UnoOptionsComponent } from './games/uno/uno-options/uno-options.component';
 import { WarningsComponent } from './widgets/warnings/warnings.component';
 import { SnakePlayerComponent } from './games/snake/snake-player/snake-player.component';
 import { SnakeGridComponent } from './games/snake/snake-player/snake-grid/snake-grid.component';
+import { UnoPlayerComponent } from './games/uno/uno-player/uno-player.component';
+import { UnoGridComponent } from './games/uno/uno-player/uno-grid/uno-grid.component';
 import { ConsoleComponent } from './widgets/console/console.component';
 import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component';
 import { SnakePreviewComponent } from './widgets/3d/snake-preview/snake-preview.component';
@@ -59,9 +62,12 @@ export function storageFactory(): OAuthStorage {
     ContextMenuComponent,
     IdeComponent,
     SnakeOptionsComponent,
+    UnoOptionsComponent,
     WarningsComponent,
     SnakePlayerComponent,
     SnakeGridComponent,
+    UnoPlayerComponent,
+    UnoGridComponent,
     ConsoleComponent,
     LeaderboardComponent,
     SnakePreviewComponent

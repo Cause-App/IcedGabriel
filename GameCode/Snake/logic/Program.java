@@ -256,16 +256,9 @@ public class Program {
 			numberOfGames = 1;
 		}
 
-
-		String log = ""+GRID_WIDTH+","+GRID_HEIGHT;
-		game = new Game();
+		String log = "";
 
 		ExecutorService executor = Executors.newSingleThreadExecutor();
-
-		SnakeThread s1 = new SnakeThread(game, new snake1.Snake(), true);
-		SnakeThread s2 = new SnakeThread(game, new snake2.Snake(), false);
-
-		log += ","+game.s1x+","+game.s1y+","+game.s2x+","+game.s2y+","+game.ax+","+game.ay;
 
 		String s1Out = "";
 
@@ -276,6 +269,12 @@ public class Program {
 			int loses = 0;
 			int draws = 0;
 			for (int gameNum=0; gameNum < numberOfGames; gameNum++) {
+				game = new Game();
+				
+				SnakeThread s1 = new SnakeThread(game, new snake1.Snake(), true);
+				SnakeThread s2 = new SnakeThread(game, new snake2.Snake(), false);
+
+				log += GRID_WIDTH+","+GRID_HEIGHT+","+game.s1x+","+game.s1y+","+game.s2x+","+game.s2y+","+game.ax+","+game.ay;
 				do {
 					over = true;
 					game.newRound();

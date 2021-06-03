@@ -1,0 +1,65 @@
+option:disabled {
+    display: none;
+}
+
+:host {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    padding: 0.5em;
+}
+
+select,
+option,
+input[type="text"] {
+    text-align: center;
+}
+
+.snake-name {
+    height: 2em;
+    label {
+        > * {
+            margin: 0 0.5em;
+        }
+    }
+}
+
+.buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 0.7em;
+
+    > * {
+        margin: 0 0.5em;
+    }
+}
+
+.delete {
+    background-color: rgb(255, 83, 83);
+
+    &:hover {
+        background-color: rgb(207, 53, 53);
+    }
+
+    &:active {
+        background-color: rgb(151, 29, 29);
+    }
+}
+
+.rank {
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    text-align: center;
+
+    .rank-slider {
+        border: 1px solid black;
+        width: max(400px, 90%);
+        height: 50px;
+    }
+}
+
