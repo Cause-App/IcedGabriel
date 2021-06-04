@@ -156,9 +156,6 @@ export class UnoGridComponent implements OnInit {
 
       pickup().then(() => {
         let round = 0;
-        if (logMessages[0]) {
-          log(logMessages[0]);
-        }
 
         const handleMove = async (cb: (winner: number) => void) => {
           try {
