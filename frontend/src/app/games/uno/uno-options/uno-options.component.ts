@@ -183,7 +183,7 @@ export class UnoOptionsComponent implements OnInit {
       return;
     }
     const currentRank = this.playersById[playerToRank].rank;
-    const listener = this.api.websocket("player/rank", { myId: playerToRank }, async (response) => {
+    const listener = this.api.websocket("uno/rank", { myId: playerToRank }, async (response) => {
       if (response.err) {
         this.warnings.setWarning("failedToRank", true);
         this.ranking = false;
@@ -218,7 +218,7 @@ export class UnoOptionsComponent implements OnInit {
         this.rankEnd = response.rank;
         this.rankQueue = -1;
         this.cancellable = false;
-        const leaderboard: any = await this.api.get("player/leaderboard", {});
+        const leaderboard: any = await this.api.get("uno/leaderboard", {});
         this.leaderboardSize = leaderboard.length;
         let i;
         for (i=0; i<leaderboard.length; i++) {
