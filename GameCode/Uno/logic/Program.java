@@ -171,11 +171,12 @@ public class Program {
 
 		}
 
-		public void makeMove() {
+		public List<Card> makeMove() {
 			played.add(lastPlayedCard);
 			lastPlayedCard = move;
 			List<Card> hand = s1Turn ? s1Hand : s2Hand;
 			List<Card> otherHand = s1Turn ? s2Hand : s1Hand;
+			List<Card> drawn = new ArrayList<>();
 			hand.remove(move);
 
 			canPickColor = false;
@@ -193,7 +194,9 @@ public class Program {
 					s1Turn = !s1Turn;
 				} else {
 					for (int i=0; i<mustPickUp2*2; i++) {
-						otherHand.add(deal());
+						Card c = deal();
+						otherHand.add(c);
+						drawn.add(c);
 					}
 					mustPickUp2 = 0;
 				}
@@ -210,7 +213,9 @@ public class Program {
 					s1Turn = !s1Turn;
 				} else {
 					for (int i=0; i<mustPickUp4*4; i++) {
-						otherHand.add(deal());
+						Card c = deal();
+						otherHand.add(c);
+						drawn.add(c);
 					}
 					mustPickUp4 = 0;
 					canPickColor = true;
@@ -220,6 +225,7 @@ public class Program {
 			} else if (move.value != Card.Value.SKIP && move.value != Card.Value.REVERSE) {
 				s1Turn = !s1Turn;
 			}
+			return drawn;
 		}
 	}
 
@@ -329,7 +335,8 @@ public class Program {
 						}
 					} else {
 						try {
-							game.makeMove();
+							boolean s1TurnAtStart = game.s1Turn;
+							List<Card> drawn = game.makeMove();
 							if (game.s1Hand.size() == 0) {
 								log += ",0,0,"+game.deck.size()+",0,1";
 								wins++;
@@ -340,6 +347,11 @@ public class Program {
 								Card q;
 								s1Pickup = new ArrayList<>();
 								s2Pickup = new ArrayList<>();
+								if (s1TurnAtStart) {
+									s2Pickup.addAll(drawn);
+								} else {
+									s1Pickup.addAll(drawn);
+								}
 								do {
 									boolean s1Turn = game.s1Turn;
 									q = game.pickUpIfCantMove();

@@ -1,9 +1,9 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { WarningsService } from 'src/app/services/warnings.service';
 import { ConsoleService } from 'src/app/services/console.service';
 
 type suit = "red" | "blue" | "green" | "yellow" | "wild";
-type value = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "skip" | "reverse" | "draw2" | "draw4" | "changecolor";
+type value = "zero" | "one" | "two" | "three" | "four" | "five" | "six" | "seven" | "eight" | "nine" | "skip" | "reverse" | "draw2" | "draw4" | "changecolor";
 interface Card {
   suit: suit;
   value: value;
@@ -19,40 +19,40 @@ const codeToCard = (code: string): Card => {
   templateUrl: './uno-grid.component.html',
   styleUrls: ['./uno-grid.component.scss']
 })
-export class UnoGridComponent implements OnInit, AfterViewInit {
+export class UnoGridComponent implements OnInit {
 
   constructor(private warnings: WarningsService, private consoleService: ConsoleService) {
     this.clearBoard();
   }
 
+  text: any = {
+    zero: "0",
+    one: "1",
+    two: "2",
+    three: "3",
+    four: "4",
+    five: "5",
+    six: "6",
+    seven: "7",
+    eight: "8",
+    nine: "9",
+    skip: "Skip",
+    reverse: "Reverse",
+    draw2: "+2",
+    draw4: "+4",
+    changecolor: "Pick Color"
+
+  }
+
   winner: string = "";
   details: string = "";
-
-  @ViewChild("canvas") canvasRef?: ElementRef;
 
   public turnsPerSecond = 1;
   public playingGame: boolean = false;
   public cancelledGame: boolean = false;
 
-  private drawCanvas() {
-    if (!this.canvasRef) {
-      return;
-    }
-    const ctx: CanvasRenderingContext2D = this.canvasRef.nativeElement.getContext("2d");
-    const width = this.canvasRef.nativeElement.width;
-    const height = this.canvasRef.nativeElement.height;
-
-    console.log(JSON.parse(JSON.stringify({
-      myHand: this.myHand,
-      deckSize: this.deckSize,
-      opponentHandSize: this.opponentHandSize,
-      lastPlayedCard: this.lastPlayedCard,
-      myTurn: this.myTurn
-    })));
-
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, width, height);
-
+  get opponentCards() {
+    return Array(this.opponentHandSize).map((x, i) => i);
   }
 
   deckSize: number = 0;
@@ -80,7 +80,6 @@ export class UnoGridComponent implements OnInit, AfterViewInit {
       this.cancelledGame = false;
       const lines = game.split("\n");
       const parts: string[] = lines[0].split(",");
-      console.log(parts);
 
       const logMessages: {[key: number]: string} = {};
 
@@ -114,7 +113,6 @@ export class UnoGridComponent implements OnInit, AfterViewInit {
       }
       this.opponentHandSize += +parts[index++];
 
-      this.drawCanvas();
 
       let round = 1;
       if (logMessages[0]) {
@@ -123,6 +121,7 @@ export class UnoGridComponent implements OnInit, AfterViewInit {
       
       const handleMove = (cb: (winner: number) => void) => {
         try {
+          console.log(this.opponentHandSize);
           if (logMessages[round]) {
             log(logMessages[round]);
           }
@@ -148,7 +147,9 @@ export class UnoGridComponent implements OnInit, AfterViewInit {
           for (let i=0; i<pickupSize; i++) {
             this.myHand.push(codeToCard(parts[index++]));
           }
-          this.opponentHandSize += +parts[index++];
+          const opponentPickupSize = +parts[index++];
+          console.log({opponentPickupSize});
+          this.opponentHandSize += opponentPickupSize;
           this.deckSize = +parts[index++];
           const nextTurn = parts[index++];
           
@@ -161,7 +162,6 @@ export class UnoGridComponent implements OnInit, AfterViewInit {
             }, 1000 / this.turnsPerSecond);
           }
           
-          this.drawCanvas();
         } catch (e) {
           console.error(e);
           this.warnings.setWarning("invalidGame", true);
@@ -185,14 +185,13 @@ export class UnoGridComponent implements OnInit, AfterViewInit {
   }
 
   private clearBoard() {
-    this.drawCanvas();
+    this.deckSize = 0;
+    this.myHand = [];
+    this.opponentHandSize = 0;
+    this.myTurn = false;
+    this.lastPlayedCard = undefined;
   }
 
   ngOnInit(): void {
   }
-
-  ngAfterViewInit(): void {
-    this.drawCanvas();
-  }
-
 }

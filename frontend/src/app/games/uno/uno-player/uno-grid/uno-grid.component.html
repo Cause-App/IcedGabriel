@@ -2,7 +2,18 @@
     1 turn/s<input type="range" min="1" max="100" [(ngModel)]="turnsPerSecond">100 turns/s
 </label>
 <div class="container">
-    <canvas #canvas [width]="1024" [height]="1024"></canvas>
+    <div class="hand">
+        <div *ngFor="let i of opponentCards" class="card back">Uno</div>
+    </div>
+    <div class="deck">
+        <div *ngIf="lastPlayedCard" class="card" [class]="lastPlayedCard.suit+' '+lastPlayedCard.value">{{text[lastPlayedCard.value]}}</div>
+        <div *ngIf="!lastPlayedCard" class="empty card"></div>
+        <div *ngIf="deckSize" class="card back">Uno</div>
+        <div *ngIf="!deckSize" class="empty card"></div>
+    </div>
+    <div class="myhand hand">
+        <div *ngFor="let i of myHand" class="card" [class]="i.suit+' '+i.value">{{text[i.value]}}</div>
+    </div>
 </div>
 <button *ngIf="playingGame && !cancelledGame" class="button1" (click)="cancelledGame=true">Cancel</button>
 <span class="winner" *ngIf="winner">{{winner}}</span>
