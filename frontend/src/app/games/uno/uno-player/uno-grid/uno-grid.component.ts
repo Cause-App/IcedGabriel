@@ -11,7 +11,7 @@ interface Card {
 
 const codeToCard = (code: string): Card => {
   const [v, s] = code.split("_").map(x => x.toLowerCase());
-  return {suit: (s as suit), value: (v as value)};
+  return { suit: (s as suit), value: (v as value) };
 }
 
 @Component({
@@ -61,6 +61,35 @@ export class UnoGridComponent implements OnInit {
   lastPlayedCard?: Card;
   myTurn: boolean = false;
 
+  animating: boolean = false;
+  animatingCard: Card | null = null;
+  animatingMe: boolean = true;
+  animatingDraw: boolean = false;
+  get animationDuration() { return 1000 / this.turnsPerSecond; };
+
+  drawAnimation(c: Card | null, me: boolean, draw: boolean) {
+    setTimeout(() => {
+      this.animating = true;
+      this.animatingCard = c;
+      this.animatingMe = me;
+      this.animatingDraw = draw;
+      setTimeout(() => {
+        this.animating = false;
+        if (!me && draw) {
+          this.opponentHandSize++;
+        } else if (me && draw) {
+          if (c) {
+            this.myHand.push(c);
+          }
+        } else if (!draw) {
+          if (c) {
+            this.lastPlayedCard = c;
+          }
+        }
+      }, this.animationDuration);
+    }, 0);
+  }
+
   @Input() set gameString(game: string) {
     if (this.playingGame) {
       this.cancelledGame = true;
@@ -81,14 +110,14 @@ export class UnoGridComponent implements OnInit {
       const lines = game.split("\n");
       const parts: string[] = lines[0].split(",");
 
-      const logMessages: {[key: number]: string} = {};
+      const logMessages: { [key: number]: string } = {};
 
       const log = (msg: string) => {
         msg = msg.replace(/&colon;/g, ":").replace(/&newline;/g, "\n").replace(/&amp;/g, "&");
         this.consoleService.log(msg);
       }
 
-      for (let x=1; x<lines.length; x++) {
+      for (let x = 1; x < lines.length; x++) {
         if (!lines[x]) {
           continue;
         }
@@ -101,83 +130,145 @@ export class UnoGridComponent implements OnInit {
       this.deckSize = +parts[0];
       this.myHand = [];
       let index = 3;
-      for (let i=0; i<+parts[1]; i++) {
+      for (let i = 0; i < +parts[1]; i++) {
         this.myHand.push(codeToCard(parts[index++]));
       }
       this.opponentHandSize = +parts[2];
       this.lastPlayedCard = codeToCard(parts[index++]);
       this.myTurn = parts[index++] === "1";
       const pickupSize = +parts[index++];
-      for (let i=0; i<pickupSize; i++) {
-        this.myHand.push(codeToCard(parts[index++]));
+      const pickup = (i: number) => {
+        if (i++ >= pickupSize) {
+          r1();
+          return;
+        }
+        const c = codeToCard(parts[index++]);
+        this.drawAnimation(c, true, true);
+        setTimeout(() => {
+          pickup(i);
+        }, 1000 / this.turnsPerSecond);
       }
-      this.opponentHandSize += +parts[index++];
+      setTimeout(() => {
+        pickup(0);
+      }, 1000 / this.turnsPerSecond);
 
+      const r1 = () => {
+        const opponentPickup = +parts[index++];
 
-      let round = 1;
-      if (logMessages[0]) {
-        log(logMessages[0]);
-      }
-      
-      const handleMove = (cb: (winner: number) => void) => {
-        try {
-          console.log(this.opponentHandSize);
-          if (logMessages[round]) {
-            log(logMessages[round]);
-          }
-          round++;
-          if (this.cancelledGame) {
-            this.playingGame = false;
+        const pickup = (i: number) => {
+          if (i++ >= opponentPickup) {
+            r2();
             return;
           }
+          this.drawAnimation(null, false, true);
+          setTimeout(() => {
+            pickup(i);
+          }, 1000 / this.turnsPerSecond);
+        }
 
-          this.lastPlayedCard = codeToCard(parts[index++]);
-          if (this.myTurn) {
-            for (let i=0; i<this.myHand.length; i++) {
-              const c = this.myHand[i];
-              if (c.suit === this.lastPlayedCard.suit && c.value === this.lastPlayedCard.value) {
-                this.myHand.splice(i, 1);
-                break;
+        setTimeout(() => {
+          pickup(0);
+        }, 1000 / this.turnsPerSecond);
+
+        const r2 = () => {
+
+          let round = 1;
+          if (logMessages[0]) {
+            log(logMessages[0]);
+          }
+
+          const handleMove = (cb: (winner: number) => void) => {
+            try {
+              if (logMessages[round]) {
+                log(logMessages[round]);
               }
+              round++;
+              if (this.cancelledGame) {
+                this.playingGame = false;
+                return;
+              }
+
+              const played = codeToCard(parts[index++]);
+              this.drawAnimation(played, this.myTurn, false);
+              if (this.myTurn) {
+                for (let i = 0; i < this.myHand.length; i++) {
+                  const c = this.myHand[i];
+                  if (c.suit === played.suit && c.value === played.value) {
+                    this.myHand.splice(i, 1);
+                    break;
+                  }
+                }
+              } else {
+                this.opponentHandSize--;
+              }
+              const pickupSize = +parts[index++];
+              const pickup = (i: number) => {
+                if (i++ >= pickupSize) {
+                  r3();
+                  return;
+                }
+                const c = codeToCard(parts[index++]);
+                this.drawAnimation(c, true, true);
+                setTimeout(() => {
+                  pickup(i);
+                }, 1000 / this.turnsPerSecond);
+              }
+
+              setTimeout(() => {
+                pickup(0);
+              }, 1000 / this.turnsPerSecond);
+
+              const r3 = () => {
+                const opponentPickupSize = +parts[index++];
+
+                const pickup = (i: number) => {
+                  if (i++ >= opponentPickupSize) {
+                    r4();
+                    return;
+                  }
+                  this.drawAnimation(null, false, true);
+                  setTimeout(() => {
+                    pickup(i);
+                  }, 1000 / this.turnsPerSecond);
+                }
+
+                setTimeout(() => {
+                  pickup(0);
+                }, 1000 / this.turnsPerSecond);
+
+                const r4 = () => {
+                  this.deckSize = +parts[index++];
+                  const nextTurn = parts[index++];
+
+                  if (nextTurn === "0") {
+                    cb(+parts[index++]);
+                  } else {
+                    this.myTurn = nextTurn === "1";
+                    setTimeout(() => {
+                      handleMove(cb);
+                    }, 1000 / this.turnsPerSecond);
+                  }
+                }
+              }
+
+            } catch (e) {
+              console.error(e);
+              this.warnings.setWarning("invalidGame", true);
             }
-          } else {
-            this.opponentHandSize--;
           }
-          const pickupSize = +parts[index++];
-          for (let i=0; i<pickupSize; i++) {
-            this.myHand.push(codeToCard(parts[index++]));
-          }
-          const opponentPickupSize = +parts[index++];
-          console.log({opponentPickupSize});
-          this.opponentHandSize += opponentPickupSize;
-          this.deckSize = +parts[index++];
-          const nextTurn = parts[index++];
-          
-          if (nextTurn === "0") {
-            cb(+parts[index++]);
-          }else {
-            this.myTurn = nextTurn === "1";
-            setTimeout(() => {
-              handleMove(cb);
-            }, 1000 / this.turnsPerSecond);
-          }
-          
-        } catch (e) {
-          console.error(e);
-          this.warnings.setWarning("invalidGame", true);
+          setTimeout(() => handleMove((winner: number) => {
+            if (winner === 0) {
+              this.winner = "You tied :/";
+            } else if (winner === 1) {
+              this.winner = "You win :)";
+            } else {
+              this.winner = "You lose :(";
+            }
+            this.playingGame = false;
+          }), 1000 / this.turnsPerSecond);
         }
       }
-      setTimeout(() => handleMove((winner: number) => {
-        if (winner === 0) {
-          this.winner = "You tied :/";
-        } else if (winner === 1) {
-          this.winner = "You win :)";
-        } else {
-          this.winner = "You lose :(";
-        }
-        this.playingGame = false;
-      }), 1000 / this.turnsPerSecond);
-  
+
     } catch (e) {
       console.error(e);
       this.warnings.setWarning("invalidGame", true);
