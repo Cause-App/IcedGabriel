@@ -172,7 +172,7 @@ export class UnoGridComponent implements OnInit {
 
         const r2 = () => {
 
-          let round = 1;
+          let round = 0;
           if (logMessages[0]) {
             log(logMessages[0]);
           }
