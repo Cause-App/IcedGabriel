@@ -29,7 +29,7 @@ export class GameListService {
 
   games: Game[] = [
     {
-      name: "Snake", id: "snake", available: false, optionsComponent: SnakeOptionsComponent, playerComponent: SnakePlayerComponent, defaultCode: [
+      name: "Snake", id: "snake", available: true, optionsComponent: SnakeOptionsComponent, playerComponent: SnakePlayerComponent, defaultCode: [
         {
           filename: "Snake.java",
           protected: true,
@@ -75,7 +75,7 @@ public class Snake implements Slitherable {
         }
       ]
     },
-    { name: "Ein", id: "ein", available: true, optionsComponent: UnoOptionsComponent, playerComponent: UnoPlayerComponent, defaultCode: [
+    { name: "Ein", id: "ein", available: false, optionsComponent: UnoOptionsComponent, playerComponent: UnoPlayerComponent, defaultCode: [
       {
         filename: "EinPlayer.java",
         protected: true,
