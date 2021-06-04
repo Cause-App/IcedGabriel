@@ -29,7 +29,7 @@ export class GameListService {
 
   games: Game[] = [
     {
-      name: "Snake", id: "snake", available: true, optionsComponent: SnakeOptionsComponent, playerComponent: SnakePlayerComponent, defaultCode: [
+      name: "Snake", id: "snake", available: false, optionsComponent: SnakeOptionsComponent, playerComponent: SnakePlayerComponent, defaultCode: [
         {
           filename: "Snake.java",
           protected: true,
