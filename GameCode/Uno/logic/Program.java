@@ -283,25 +283,19 @@ public class Program {
 				log += game.s1Turn ? ",1" : ",2";
 
 				Card p;
-				List<Card> s1Pickup = new ArrayList<>();
-				List<Card> s2Pickup = new ArrayList<>();
 				do {
 					boolean s1Turn = game.s1Turn;
 					p = game.pickUpIfCantMove();
 					if (p != null) {
 						if (s1Turn) {
-							s1Pickup.add(p);
+							log += ","+p;
 						} else {
-							s2Pickup.add(p);
+							log += ",1";
 						}
 					}
 				} while (p != null);
 
-				log += ","+s1Pickup.size();
-				for (Card c: s1Pickup) {
-					log += ","+c;
-				}
-				log += ","+s2Pickup.size();
+				log += ",0";
 
 				do {
 					game.newRound();
@@ -327,10 +321,10 @@ public class Program {
 
 					if (!game.moveValid()) {
 						if (game.s1Turn) {
-							log += ",0,0,"+game.deck.size()+",0,2";
+							log += ",0,"+game.deck.size()+",0,2";
 							loses++;
 						} else {
-							log += ",0,0,"+game.deck.size()+",0,1";
+							log += ",0,"+game.deck.size()+",0,1";
 							wins++;
 						}
 					} else {
@@ -338,43 +332,41 @@ public class Program {
 							boolean s1TurnAtStart = game.s1Turn;
 							List<Card> drawn = game.makeMove();
 							if (game.s1Hand.size() == 0) {
-								log += ",0,0,"+game.deck.size()+",0,1";
+								log += ",0,"+game.deck.size()+",0,1";
 								wins++;
 							} else if (game.s2Hand.size() == 0) {
-								log += ",0,0,"+game.deck.size()+",0,2";
+								log += ",0,"+game.deck.size()+",0,2";
 								loses++;
 							} else {
 								Card q;
-								s1Pickup = new ArrayList<>();
-								s2Pickup = new ArrayList<>();
 								if (s1TurnAtStart) {
-									s2Pickup.addAll(drawn);
+									for (Card c: drawn) {
+										log += ",1";
+									}
 								} else {
-									s1Pickup.addAll(drawn);
+									for (Card c: drawn) {
+										log += ","+c;
+									}
 								}
 								do {
 									boolean s1Turn = game.s1Turn;
 									q = game.pickUpIfCantMove();
 									if (q != null) {
 										if (s1Turn) {
-											s1Pickup.add(q);
+											log += ","+q;
 										} else {
-											s2Pickup.add(q);
+											log += ",1";
 										}
 									}
 								} while (q != null);
+								log += ",0";
 
-								log += ","+s1Pickup.size();
-								for (Card c: s1Pickup) {
-									log += ","+c;
-								}
-								log += ","+s2Pickup.size();
 								log += ","+game.deck.size();
 								log += game.s1Turn ? ",1" : ",2";
 								over = false;
 							}
 						} catch (OutOfCardsException e) {
-							log += ",0,0,0,0";
+							log += ",0,0,0";
 							draws++;
 						}
 					}

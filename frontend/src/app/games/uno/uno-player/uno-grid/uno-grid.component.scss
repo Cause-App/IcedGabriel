@@ -28,7 +28,7 @@ $card-margin: 0.2em;
 .container {
   margin-top: 1em;
   display: inline-flex;
-  width: min(90%, 500px);
+  width: max(90%, 250px);
   min-height: 100px;
   position: relative;
   flex-direction: column;
