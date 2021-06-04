@@ -64,14 +64,14 @@ export class UnoPlayerComponent implements OnInit {
   }
 
   async loadOpponents() {
-    const response: any = await this.api.get("uno/mine", {});
+    const response: any = await this.api.get("ein/mine", {});
     this.myPlayers = response;
     this.opponentId = this.myPlayers[0]._id;
 
-    const lbResponse: any = await this.api.get("uno/leaderboard", {});
+    const lbResponse: any = await this.api.get("ein/leaderboard", {});
     this.leaderboard = lbResponse;
 
-    const allResponse: any = await this.api.get("uno/getAllPlayers", {});
+    const allResponse: any = await this.api.get("ein/getAllPlayers", {});
     this.allPlayers = allResponse;
     for (const player of this.allPlayers) {
       player["name&dev"] = `${player.name} by ${player.ownerName}`;
@@ -92,7 +92,7 @@ export class UnoPlayerComponent implements OnInit {
   }
 
   cancel() {
-    this.api.websocket("uno/cancel", {}, () => { });
+    this.api.websocket("ein/cancel", {}, () => { });
     this.queue = -1;
   }
 
@@ -101,10 +101,10 @@ export class UnoPlayerComponent implements OnInit {
       return;
     }
     this.gameString = "";
-    this.api.websocket("uno/play", { myId: this.myId, opponentId: this.opponentId }, (response: any) => {
+    this.api.websocket("ein/play", { myId: this.myId, opponentId: this.opponentId }, (response: any) => {
       if (response.err) {
         console.error(response.err);
-        this.consoleService.log("Below are the errors thrown by the Java compiler. Note that some of the errors may be for your own code, and some may be for your opponent's code. Errors in files in the directory './unoplayer1' are for your own code, and those in './unoplayer2' are for your opponent's.\n\n");
+        this.consoleService.log("Below are the errors thrown by the Java compiler. Note that some of the errors may be for your own code, and some may be for your opponent's code. Errors in files in the directory './einplayer1' are for your own code, and those in './einplayer2' are for your opponent's.\n\n");
         if (response.err.stdout) {
           this.consoleService.log(response.err.stdout);
         }

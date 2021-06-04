@@ -13,7 +13,7 @@ export interface UnoPlayer {
   rank?: number;
 }
 
-const DEFAULT_PLAYER_NAME = "An unnamed Uno player";
+const DEFAULT_PLAYER_NAME = "An unnamed Ein player";
 
 @Component({
   selector: 'app-uno-options',
@@ -56,7 +56,7 @@ export class UnoOptionsComponent implements OnInit {
       this.onFilesLoaded(this.playersById[this.playerID].code);
     } else {
       this.playerName = DEFAULT_PLAYER_NAME;
-      this.onFilesLoaded(this.gameList.gameWithID("uno")?.defaultCode ?? []);
+      this.onFilesLoaded(this.gameList.gameWithID("ein")?.defaultCode ?? []);
     }
     this.save();
     this.onIdChanged(this.playerID);
@@ -96,7 +96,7 @@ export class UnoOptionsComponent implements OnInit {
     }
     let response: any;
     try {
-      response = await this.api.post("uno/editplayer", { id: playerID, name: this.playerName, code });
+      response = await this.api.post("ein/editplayer", { id: playerID, name: this.playerName, code });
     } catch {
       response = { err: "Could not connect to server" };
     }
@@ -127,7 +127,7 @@ export class UnoOptionsComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    const players: any = await this.api.get("uno/mine", {});
+    const players: any = await this.api.get("ein/mine", {});
     this.players = players;
     for (const player of this.players) {
       this.playersById[player._id] = player;
@@ -155,7 +155,7 @@ export class UnoOptionsComponent implements OnInit {
     }
     let response: any;
     try {
-      response = await this.api.get("uno/deleteplayer", { id: this.playerID });
+      response = await this.api.get("ein/deleteplayer", { id: this.playerID });
     } catch {
       response = { err: "Could not connect to server" };
     }
@@ -183,7 +183,7 @@ export class UnoOptionsComponent implements OnInit {
       return;
     }
     const currentRank = this.playersById[playerToRank].rank;
-    const listener = this.api.websocket("uno/rank", { myId: playerToRank }, async (response) => {
+    const listener = this.api.websocket("ein/rank", { myId: playerToRank }, async (response) => {
       if (response.err) {
         this.warnings.setWarning("failedToRank", true);
         this.ranking = false;
@@ -218,7 +218,7 @@ export class UnoOptionsComponent implements OnInit {
         this.rankEnd = response.rank;
         this.rankQueue = -1;
         this.cancellable = false;
-        const leaderboard: any = await this.api.get("uno/leaderboard", {});
+        const leaderboard: any = await this.api.get("ein/leaderboard", {});
         this.leaderboardSize = leaderboard.length;
         let i;
         for (i=0; i<leaderboard.length; i++) {

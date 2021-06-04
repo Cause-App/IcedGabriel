@@ -17,7 +17,7 @@ const maxHeapSize = 1024 * 1024 * 64;
 // The value must be a multiple of, and greater than, 1024 bytes (1KB).
 
 const threadStackSize = 1024 * 512;
-const unoCodePath = "./GameCode/Uno";
+const unoCodePath = "./GameCode/Ein";
 
 
 const MOVE_MAX_MILLIS = 50;
@@ -82,7 +82,7 @@ router.post("/editplayer", requireLogin, (req, res) => {
 
     const id = req.body.id && req.body.id !== "undefined" ? req.body.id : undefined;
 
-    const name = req.body.name || "An unnamed Uno player";
+    const name = req.body.name || "An unnamed Ein player";
 
     if (name.length > 32) {
         res.json({ err: "Failed to update player. Player name too long" });
@@ -245,10 +245,10 @@ const playGame = async (gamePath, myUno, opponentUno, callback, listener, ranked
         onDequeue.removeListener("dequeue", listener);
         fse.copySync(unoCodePath, gamePath);
 
-        const myUnoPath = path.join(gamePath, "unoplayer1");
-        const opponentUnoPath = path.join(gamePath, "unoplayer2");
+        const myUnoPath = path.join(gamePath, "einplayer1");
+        const opponentUnoPath = path.join(gamePath, "einplayer2");
 
-        for (const [unoPath, unoCode, package] of [[myUnoPath, myUno.code, "unoplayer1"], [opponentUnoPath, opponentUno.code, "unoplayer2"]]) {
+        for (const [unoPath, unoCode, package] of [[myUnoPath, myUno.code, "einplayer1"], [opponentUnoPath, opponentUno.code, "einplayer2"]]) {
             fs.mkdirSync(unoPath);
 
             for (const { filename, code } of unoCode) {
@@ -262,7 +262,7 @@ const playGame = async (gamePath, myUno, opponentUno, callback, listener, ranked
 
         await runCommand(`cd ${gamePath} && javac logic/Program.java`);
 
-        const output = await runCommand(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==./uno.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${gamePath} logic.Program ${MOVE_MAX_MILLIS} ${ranked ? NUMBER_OF_RANKED_GAMES : -1}`);
+        const output = await runCommand(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==./ein.policy -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${gamePath} logic.Program ${MOVE_MAX_MILLIS} ${ranked ? NUMBER_OF_RANKED_GAMES : -1}`);
         callback(output);
 
     } catch (err) {
@@ -273,15 +273,15 @@ const playGame = async (gamePath, myUno, opponentUno, callback, listener, ranked
 
 const socketHandlers = (socket) => {
     socket.setMaxListeners(Infinity);
-    socket.on("uno/play", async (data, token) => {
+    socket.on("ein/play", async (data, token) => {
         const userData = await validateToken(token);
         if (!userData) {
-            socket.emit("uno/play", { err: "Access Denied" });
+            socket.emit("ein/play", { err: "Access Denied" });
             return;
         }
 
         if (!data.myId || !data.opponentId) {
-            socket.emit("uno/play", { err: "Player IDs not provided" });
+            socket.emit("ein/play", { err: "Player IDs not provided" });
             return;
         }
 
@@ -292,26 +292,26 @@ const socketHandlers = (socket) => {
                 return;
             }
             if (response.gameID) {
-                socket.once("uno/cancel", () => {
+                socket.once("ein/cancel", () => {
                     removeFromQueue(response.gameID);
                     cancelled = true;
                 });
             } else {
-                socket.emit("uno/play", response);
+                socket.emit("ein/play", response);
             }
         });
 
     });
 
-    socket.on("uno/rank", async (data, token) => {
+    socket.on("ein/rank", async (data, token) => {
         const userData = await validateToken(token);
         if (!userData) {
-            socket.emit("uno/rank", { err: "Access Denied" });
+            socket.emit("ein/rank", { err: "Access Denied" });
             return;
         }
 
         if (!data.myId) {
-            socket.emit("uno/rank", { err: "Player ID not provided" });
+            socket.emit("ein/rank", { err: "Player ID not provided" });
             return;
         }
 
@@ -322,7 +322,7 @@ const socketHandlers = (socket) => {
 
         const myUno = await unoCollection.findOne({ _id: mongo.ObjectId(myId), owner: userData.sub });
         if (!myUno) {
-            socket.emit("uno/rank", { err: "Your player does not exist or you do not own it" });
+            socket.emit("ein/rank", { err: "Your player does not exist or you do not own it" });
             return;
         }
 
@@ -341,11 +341,11 @@ const socketHandlers = (socket) => {
                     await unoLbCollection.updateMany({ rank: { $gte: n } }, { $inc: { rank: 1 } });
                     await unoLbCollection.insertOne({ _id: mongo.ObjectId(myId), owner: myUno.owner, ownerName: myUno.ownerName, code: myUno.code, name: myUno.name, rank: n });
 
-                    socket.emit("uno/rank", { rank: n });
+                    socket.emit("ein/rank", { rank: n });
                 });
             } catch (err) {
                 console.error(err);
-                socket.emit("uno/rank", { err });
+                socket.emit("ein/rank", { err });
             } finally {
                 await session.endSession();
             }
@@ -359,7 +359,7 @@ const socketHandlers = (socket) => {
                 insertAt(start);
                 return
             }
-            socket.emit("uno/rank", { start, end });
+            socket.emit("ein/rank", { start, end });
             const opponentIndex = Math.floor((start + end) / 2);
             unoLbCollection.find({ _id: { $ne: mongo.ObjectId(myId) } }).sort({ rank: 1 }).skip(opponentIndex).limit(1).forEach((opponentUno) => {
                 submitGame(myId, opponentUno._id, userData, unoLbCollection, (response) => {
@@ -370,7 +370,7 @@ const socketHandlers = (socket) => {
                         if (response.gameID) {
                             gameID = response.gameID;
                         } else {
-                            socket.emit("uno/rank", response);
+                            socket.emit("ein/rank", response);
                         }
                         return;
                     }
@@ -388,12 +388,12 @@ const socketHandlers = (socket) => {
 
         doRound(0, unoCount - 1);
 
-        socket.once("uno/cancelrank", () => {
+        socket.once("ein/cancelrank", () => {
             cancelled = true;
             if (gameID) {
                 removeFromQueue(gameID);
             }
-            socket.emit("uno/rank", { cancel: true });
+            socket.emit("ein/rank", { cancel: true });
         })
     });
 };

@@ -12,10 +12,10 @@ public class Program {
 
 	private static class PlayerThread implements Runnable {
 		private final Game game;
-		private final UnoPlayerInterface player;
+		private final EinPlayerInterface player;
 		private final boolean s1;
 
-		public PlayerThread(Game game, UnoPlayerInterface player, boolean s1) {
+		public PlayerThread(Game game, EinPlayerInterface player, boolean s1) {
 			this.game = game;
 			this.player = player;
 			this.s1 = s1;
@@ -269,8 +269,8 @@ public class Program {
 			for (int gameNum=0; gameNum < numberOfGames; gameNum++) {
 				game = new Game();
 
-				PlayerThread s1 = new PlayerThread(game, new unoplayer1.UnoPlayer(), true);
-				PlayerThread s2 = new PlayerThread(game, new unoplayer2.UnoPlayer(), false);
+				PlayerThread s1 = new PlayerThread(game, new einplayer1.EinPlayer(), true);
+				PlayerThread s2 = new PlayerThread(game, new einplayer2.EinPlayer(), false);
 
 
 				log += game.deck.size()+","+game.s1Hand.size()+","+game.s2Hand.size();

@@ -27,9 +27,9 @@ app.use(express.urlencoded({ extended: true }));
 const router = express.Router();
 
 const {snakeRouter, snakeSocketHandlers} = require("./games/snake");
-const {unoRouter, unoSocketHandlers} = require("./games/uno");
+const {unoRouter, unoSocketHandlers} = require("./games/ein");
 router.use("/api/snake", snakeRouter);
-router.use("/api/uno", unoRouter);
+router.use("/api/ein", unoRouter);
 
 app.use(router);
 

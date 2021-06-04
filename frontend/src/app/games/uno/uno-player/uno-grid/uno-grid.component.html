@@ -4,7 +4,7 @@
 <div class="container">
     <div class="hand" [ngClass]="{active: !myTurn}">
         <div *ngFor="let i of opponentCards" class="card back">
-            <div class="text">Uno</div>
+            <div class="text">Ein</div>
         </div>
     </div>
     <div class="deck">
@@ -14,16 +14,16 @@
                 [class]="animatingCard? (''+animatingCard.value+' '+animatingCard.suit): 'back'"
                 [ngStyle]="{animationName: animatingMe?'floatdown': 'floatup', animationDuration: ''+animationDuration+'ms', animationDirection: 'reverse'}">
                 <div class="text">
-                    {{animatingCard? text[animatingCard.value] : 'Uno'}}
+                    {{animatingCard? text[animatingCard.value] : 'Ein'}}
                 </div>
             </div>
         </div>
         <div class="card" [class]="deckSize? 'back': 'empty'">
-            <div class="text">{{deckSize? 'Uno': ''}}</div>
+            <div class="text">{{deckSize? 'Ein': ''}}</div>
             <div *ngIf="animating && animatingDraw" class="card floating"
                 [class]="animatingCard? (''+animatingCard.value+' '+animatingCard.suit): 'back'"
                 [ngStyle]="{animationName: animatingMe?'floatdown': 'floatup', animationDuration: ''+animationDuration+'ms', animationDirection: 'normal'}">
-                <div class="text">{{animatingCard? text[animatingCard.value] : 'Uno'}}</div>
+                <div class="text">{{animatingCard? text[animatingCard.value] : 'Ein'}}</div>
             </div>
         </div>
     </div>
