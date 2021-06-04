@@ -138,7 +138,7 @@ $card-margin: 0.2em;
       .floating {
         position: absolute;
         left: 0;
-        animation-timing-function: linear;
+        animation-timing-function: ease-in;
         margin: 0;
         z-index: 2;
       }
