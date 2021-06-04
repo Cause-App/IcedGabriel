@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { WarningsService } from 'src/app/services/warnings.service';
 import { ConsoleService } from 'src/app/services/console.service';
+import { faBan, faRandom } from '@fortawesome/free-solid-svg-icons';
 
 type suit = "red" | "blue" | "green" | "yellow" | "wild";
 type value = "zero" | "one" | "two" | "three" | "four" | "five" | "six" | "seven" | "eight" | "nine" | "skip" | "reverse" | "draw2" | "draw4" | "changecolor";
@@ -36,12 +37,8 @@ export class UnoGridComponent implements OnInit {
     seven: "7",
     eight: "8",
     nine: "9",
-    skip: "Skip",
-    reverse: "Reverse",
     draw2: "+2",
     draw4: "+4",
-    changecolor: "Pick Color"
-
   }
 
   winner: string = "";
@@ -54,6 +51,9 @@ export class UnoGridComponent implements OnInit {
   get opponentCards() {
     return Array(this.opponentHandSize).map((x, i) => i);
   }
+
+  faBan = faBan;
+  faRandom = faRandom;
 
   deckSize: number = 0;
   myHand: Card[] = [];

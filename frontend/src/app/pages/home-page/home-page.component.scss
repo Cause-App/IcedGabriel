@@ -65,6 +65,21 @@ h1 {
         margin: 1em 0;
         width: 100%;
         display: block;
+        position: relative;
+
+        .preview {
+            position: absolute;
+            top: 50%;
+            left: 120%;
+            height: 3em;
+            transform: translateY(-50%) translateX(-50%) rotate(20deg);
+            border: 1px solid black;
+            box-shadow: 0 0 10px 7px black;
+
+            &.none {
+                display: none;
+            }
+        }
 
         &:hover:not(:disabled) {
             transform: scale(1.1);
@@ -109,3 +124,4 @@ app-snake-preview {
     left: 0;
     z-index: -1;
 }
+

@@ -3,33 +3,79 @@
 </label>
 <div class="container">
     <div class="hand" [ngClass]="{active: !myTurn}">
-        <div *ngFor="let i of opponentCards" class="card back">
-            <div class="text">Ein</div>
+        <div *ngFor="let i of opponentCards" class="card-container">
+            <div class="card back">
+                <div class="text">Ein</div>
+            </div>
         </div>
     </div>
     <div class="deck">
-        <div class="card" [class]="lastPlayedCard? (lastPlayedCard.suit+' '+lastPlayedCard.value): 'empty'">
-            <div class="text">{{lastPlayedCard? text[lastPlayedCard.value]: ''}}</div>
+        <div class="card-container">
+            <div class="card" [class]="lastPlayedCard? (lastPlayedCard.suit+' '+lastPlayedCard.value): 'empty'">
+                <div class="text"
+                    *ngIf="lastPlayedCard?.value !== 'skip' && lastPlayedCard?.value !== 'reverse' && lastPlayedCard?.value !== 'changecolor'">
+                    {{lastPlayedCard? text[lastPlayedCard.value] : ''}}</div>
+                <fa-icon *ngIf="lastPlayedCard?.value === 'skip' || lastPlayedCard?.value==='reverse'"
+                    [icon]="lastPlayedCard?.value==='skip' ? faBan : faRandom"></fa-icon>
+                <div class="rainbow" *ngIf="lastPlayedCard?.value === 'changecolor'">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+
+            </div>
             <div *ngIf="animating && !animatingDraw" class="card floating"
-                [class]="animatingCard? (''+animatingCard.value+' '+animatingCard.suit): 'back'"
+                [class]="animatingCard? animatingCard.suit: 'back'"
                 [ngStyle]="{animationName: animatingMe?'floatdown': 'floatup', animationDuration: ''+animationDuration+'ms', animationDirection: 'reverse'}">
-                <div class="text">
-                    {{animatingCard? text[animatingCard.value] : 'Ein'}}
+                <div class="text"
+                    *ngIf="animatingCard?.value !== 'skip' && animatingCard?.value !== 'reverse' && animatingCard?.value !== 'changecolor'">
+                    {{animatingCard? text[animatingCard.value] : 'Ein'}}</div>
+                <fa-icon *ngIf="animatingCard?.value === 'skip' || animatingCard?.value==='reverse'"
+                    [icon]="animatingCard?.value==='skip' ? faBan : faRandom"></fa-icon>
+                <div class="rainbow" *ngIf="animatingCard?.value === 'changecolor'">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
                 </div>
             </div>
         </div>
-        <div class="card" [class]="deckSize? 'back': 'empty'">
-            <div class="text">{{deckSize? 'Ein': ''}}</div>
+        <div class="card-container">
+            <div class="card" [class]="deckSize? 'back': 'empty'">
+                <div class="text">{{deckSize? 'Ein': ''}}</div>
+            </div>
             <div *ngIf="animating && animatingDraw" class="card floating"
-                [class]="animatingCard? (''+animatingCard.value+' '+animatingCard.suit): 'back'"
+                [class]="animatingCard? animatingCard.suit: 'back'"
                 [ngStyle]="{animationName: animatingMe?'floatdown': 'floatup', animationDuration: ''+animationDuration+'ms', animationDirection: 'normal'}">
-                <div class="text">{{animatingCard? text[animatingCard.value] : 'Ein'}}</div>
+                <div class="text"
+                    *ngIf="animatingCard?.value !== 'skip' && animatingCard?.value !== 'reverse' && animatingCard?.value !== 'changecolor'">
+                    {{animatingCard? text[animatingCard.value] : 'Ein'}}</div>
+                <fa-icon *ngIf="animatingCard?.value === 'skip' || animatingCard?.value==='reverse'"
+                    [icon]="animatingCard?.value==='skip' ? faBan : faRandom"></fa-icon>
+                <div class="rainbow" *ngIf="animatingCard?.value === 'changecolor'">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
             </div>
         </div>
     </div>
     <div class="myhand hand" [ngClass]="{active: myTurn}">
-        <div *ngFor="let i of myHand" class="card" [class]="i.suit+' '+i.value">
-            <div class="text">{{text[i.value]}}</div>
+        <div *ngFor="let i of myHand" class="card-container">
+            <div class="card" [class]="i.suit">
+                <div class="text" *ngIf="i.value !== 'skip' && i.value !== 'reverse' && i.value !== 'changecolor'">
+                    {{text[i.value]}}</div>
+                <fa-icon *ngIf="i.value === 'skip' || i.value==='reverse'" [icon]="i.value==='skip' ? faBan : faRandom">
+                </fa-icon>
+                <div class="rainbow" *ngIf="i.value === 'changecolor'">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
