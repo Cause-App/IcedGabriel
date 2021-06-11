@@ -1,25 +1,43 @@
-import { Component, EventEmitter, Input, OnInit } from '@angular/core';
+import { Component, ComponentFactoryResolver, EventEmitter, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { faTrophy } from '@fortawesome/free-solid-svg-icons';
 import { ApiService } from 'src/app/services/api.service';
 import { ConsoleService } from 'src/app/services/console.service';
 import { WarningsService } from 'src/app/services/warnings.service';
-import { UnoPlayer } from '../uno-options/uno-options.component';
+import { Player } from '../../generic/game-options/game-options.component';
 
 type opponentSelectMethod = "mine" | "leaderboard" | "search";
 
 @Component({
-  selector: 'app-uno-player',
-  templateUrl: './uno-player.component.html',
-  styleUrls: ['./uno-player.component.scss']
+  templateUrl: './game-player.component.html',
+  styleUrls: ['./game-player.component.scss']
 })
-export class UnoPlayerComponent implements OnInit {
+export class GamePlayerComponent implements OnInit {
 
-  public myPlayers: UnoPlayer[] = [];
-  public leaderboard: UnoPlayer[] = [];
+  public myPlayers: Player[] = [];
+  public leaderboard: Player[] = [];
+
+  gameID: string = "";
+  errorPreamble: string = "Below are the errors thrown by the Java compiler. Note that some of the errors may be for your own code, and some may be for your opponent's code.\n\n";
+  gridComponent?: any;
 
   queue: number = -1;
 
   faTrophy = faTrophy;
+
+  reference: any;
+
+  @ViewChild("grid", { read: ViewContainerRef }) gridContainer?: ViewContainerRef;
+
+  ngAfterViewInit(): void {
+    if (this.gridComponent) {
+      if (this.gridContainer) {
+        this.gridContainer.clear();
+        const factory = this.resolver.resolveComponentFactory(this.gridComponent);
+        this.reference = this.gridContainer.createComponent(factory);
+        this.reference.instance.gameString = this.gameString;
+      }
+    }
+  }
 
   myId: string = "";
   opponentId: string = "";
@@ -64,21 +82,21 @@ export class UnoPlayerComponent implements OnInit {
   }
 
   async loadOpponents() {
-    const response: any = await this.api.get("ein/mine", {});
+    const response: any = await this.api.get(`${this.gameID}/mine`, {});
     this.myPlayers = response;
     this.opponentId = this.myPlayers[0]._id;
 
-    const lbResponse: any = await this.api.get("ein/leaderboard", {});
+    const lbResponse: any = await this.api.get(`${this.gameID}/leaderboard`, {});
     this.leaderboard = lbResponse;
 
-    const allResponse: any = await this.api.get("ein/getAllPlayers", {});
+    const allResponse: any = await this.api.get(`${this.gameID}/getAllPlayers`, {});
     this.allPlayers = allResponse;
     for (const player of this.allPlayers) {
       player["name&dev"] = `${player.name} by ${player.ownerName}`;
     }
   }
 
-  constructor(private api: ApiService, private warnings: WarningsService, public consoleService: ConsoleService) { }
+  constructor(private api: ApiService, private warnings: WarningsService, public consoleService: ConsoleService, private resolver: ComponentFactoryResolver) { }
 
   async ngOnInit(): Promise<void> {
 
@@ -92,7 +110,7 @@ export class UnoPlayerComponent implements OnInit {
   }
 
   cancel() {
-    this.api.websocket("ein/cancel", {}, () => { });
+    this.api.websocket(`${this.gameID}/cancel`, {}, () => { });
     this.queue = -1;
   }
 
@@ -101,10 +119,10 @@ export class UnoPlayerComponent implements OnInit {
       return;
     }
     this.gameString = "";
-    this.api.websocket("ein/play", { myId: this.myId, opponentId: this.opponentId }, (response: any) => {
+    this.api.websocket(`${this.gameID}/play`, { myId: this.myId, opponentId: this.opponentId }, (response: any) => {
       if (response.err) {
         console.error(response.err);
-        this.consoleService.log("Below are the errors thrown by the Java compiler. Note that some of the errors may be for your own code, and some may be for your opponent's code. Errors in files in the directory './einplayer1' are for your own code, and those in './einplayer2' are for your opponent's.\n\n");
+        this.consoleService.log(this.errorPreamble);
         if (response.err.stdout) {
           this.consoleService.log(response.err.stdout);
         }
@@ -118,6 +136,9 @@ export class UnoPlayerComponent implements OnInit {
       } else if (response.stdout) {
         this.queue = -1;
         this.gameString = response.stdout;
+        if (this.reference) {
+          this.reference.instance.gameString = this.gameString;
+        }
       } else {
         this.queue = -1;
         this.warnings.setWarning("invalidGame", true);

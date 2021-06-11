@@ -20,15 +20,17 @@ import { DragulaModule } from 'ng2-dragula';
 import { ContextMenuComponent } from './widgets/context-menu/context-menu.component';
 import { IdeComponent } from './widgets/ide/ide.component';
 import { SnakeOptionsComponent } from './games/snake/snake-options/snake-options.component';
-import { UnoOptionsComponent } from './games/uno/uno-options/uno-options.component';
+import { EinOptionsComponent } from './games/ein/ein-options/ein-options.component';
 import { WarningsComponent } from './widgets/warnings/warnings.component';
 import { SnakePlayerComponent } from './games/snake/snake-player/snake-player.component';
 import { SnakeGridComponent } from './games/snake/snake-player/snake-grid/snake-grid.component';
-import { UnoPlayerComponent } from './games/uno/uno-player/uno-player.component';
-import { UnoGridComponent } from './games/uno/uno-player/uno-grid/uno-grid.component';
+import { EinPlayerComponent } from './games/ein/ein-player/ein-player.component';
+import { EinGridComponent } from './games/ein/ein-player/ein-grid/ein-grid.component';
 import { ConsoleComponent } from './widgets/console/console.component';
 import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component';
 import { SnakePreviewComponent } from './widgets/3d/snake-preview/snake-preview.component';
+import { GameOptionsComponent } from './games/generic/game-options/game-options.component';
+import { GamePlayerComponent } from './games/generic/game-player/game-player.component';
 
 const socketConfig: SocketIoConfig = { url: '/', options: {} };
 
@@ -62,15 +64,17 @@ export function storageFactory(): OAuthStorage {
     ContextMenuComponent,
     IdeComponent,
     SnakeOptionsComponent,
-    UnoOptionsComponent,
+    EinOptionsComponent,
     WarningsComponent,
     SnakePlayerComponent,
     SnakeGridComponent,
-    UnoPlayerComponent,
-    UnoGridComponent,
+    EinPlayerComponent,
+    EinGridComponent,
     ConsoleComponent,
     LeaderboardComponent,
-    SnakePreviewComponent
+    SnakePreviewComponent,
+    GameOptionsComponent,
+    GamePlayerComponent
   ],
   imports: [
     BrowserModule,

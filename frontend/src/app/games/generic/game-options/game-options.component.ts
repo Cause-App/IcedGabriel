@@ -4,7 +4,7 @@ import { WarningsService } from 'src/app/services/warnings.service';
 import { CodeFile, GameListService } from 'src/app/services/game-list.service';
 import { UserDataService } from 'src/app/services/user-data.service';
 
-export interface UnoPlayer {
+export interface Player {
   _id: string;
   name: string;
   code: CodeFile[];
@@ -13,24 +13,29 @@ export interface UnoPlayer {
   rank?: number;
 }
 
-const DEFAULT_PLAYER_NAME = "An unnamed Ein player";
-
 @Component({
-  selector: 'app-uno-options',
-  templateUrl: './uno-options.component.html',
-  styleUrls: ['./uno-options.component.scss']
+  templateUrl: './game-options.component.html',
+  styleUrls: ['./game-options.component.scss']
 })
-export class UnoOptionsComponent implements OnInit {
+export class GameOptionsComponent implements OnInit {
+
+  gameID: string = "";
+  defaultPlayerName = "An unnamed player";
+  myPlayersString: string = "My Players"
+  newPlayerString: string = "New Player"
+  deletePlayerString: string = "Delete This Player"
+  renamePlayerString: string = "Rename Player"
+  deletePrompt: (code: string) => string = (code: string) => `Are you sure you want to delete this player? You will be unable to play as this player; others will be unable to play against this player; its rank in the leaderboard will be lost. This action is irreversible. Please enter '${code}' to confirm`;
 
   constructor(private api: ApiService, private gameList: GameListService, private warnings: WarningsService, private user: UserDataService) {
   }
 
-  players: UnoPlayer[] = [];
-  playersById: { [key: string]: UnoPlayer } = {};
+  players: Player[] = [];
+  playersById: { [key: string]: Player } = {};
 
   renamingPlayer = false;
 
-  playerName: string = DEFAULT_PLAYER_NAME;
+  playerName: string = this.defaultPlayerName;
   playerID: string | undefined | null;
 
   leaderboardSize: number = 0;
@@ -55,8 +60,8 @@ export class UnoOptionsComponent implements OnInit {
       this.playerName = this.playersById[this.playerID].name;
       this.onFilesLoaded(this.playersById[this.playerID].code);
     } else {
-      this.playerName = DEFAULT_PLAYER_NAME;
-      this.onFilesLoaded(this.gameList.gameWithID("ein")?.defaultCode ?? []);
+      this.playerName = this.defaultPlayerName;
+      this.onFilesLoaded(this.gameList.gameWithID(this.gameID)?.defaultCode ?? []);
     }
     this.save();
     this.onIdChanged(this.playerID);
@@ -96,7 +101,7 @@ export class UnoOptionsComponent implements OnInit {
     }
     let response: any;
     try {
-      response = await this.api.post("ein/editplayer", { id: playerID, name: this.playerName, code });
+      response = await this.api.post(`${this.gameID}/editplayer`, { id: playerID, name: this.playerName, code });
     } catch {
       response = { err: "Could not connect to server" };
     }
@@ -109,7 +114,7 @@ export class UnoOptionsComponent implements OnInit {
     this.warnings.setWarning("unsavedChanges", false);
     this.warnings.setWarning("save", true);
     if (response.id) {
-      const newPlayer: UnoPlayer = {
+      const newPlayer: Player = {
         _id: response.id,
         name: this.playerName,
         code,
@@ -127,7 +132,7 @@ export class UnoOptionsComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    const players: any = await this.api.get("ein/mine", {});
+    const players: any = await this.api.get(`${this.gameID}/mine`, {});
     this.players = players;
     for (const player of this.players) {
       this.playersById[player._id] = player;
@@ -149,13 +154,13 @@ export class UnoOptionsComponent implements OnInit {
     if (!this.playerID) {
       return;
     }
-    const promptString = `Are you sure you want to delete this player? You will be unable to play as this player; others will be unable to play against this player; its rank in the leaderboard will be lost. This action is irreversible. Please enter '${this.playerName}' to confirm`;
+    const promptString = this.deletePrompt(this.playerName);
     if (prompt(promptString) !== this.playerName) {
       return;
     }
     let response: any;
     try {
-      response = await this.api.get("ein/deleteplayer", { id: this.playerID });
+      response = await this.api.get(`${this.gameID}/deleteplayer`, { id: this.playerID });
     } catch {
       response = { err: "Could not connect to server" };
     }
@@ -183,7 +188,7 @@ export class UnoOptionsComponent implements OnInit {
       return;
     }
     const currentRank = this.playersById[playerToRank].rank;
-    const listener = this.api.websocket("ein/rank", { myId: playerToRank }, async (response) => {
+    const listener = this.api.websocket(`${this.gameID}/rank`, { myId: playerToRank }, async (response) => {
       if (response.err) {
         this.warnings.setWarning("failedToRank", true);
         this.ranking = false;
@@ -218,7 +223,7 @@ export class UnoOptionsComponent implements OnInit {
         this.rankEnd = response.rank;
         this.rankQueue = -1;
         this.cancellable = false;
-        const leaderboard: any = await this.api.get("ein/leaderboard", {});
+        const leaderboard: any = await this.api.get(`${this.gameID}/leaderboard`, {});
         this.leaderboardSize = leaderboard.length;
         let i;
         for (i=0; i<leaderboard.length; i++) {
@@ -246,7 +251,7 @@ export class UnoOptionsComponent implements OnInit {
   }
 
   cancelRank() {
-    this.api.websocket("player/cancelrank", {}, () => {});
+    this.api.websocket(`${this.gameID}/cancelrank`, {}, () => {});
     this.ranking = false;
   }
 

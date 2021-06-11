@@ -16,11 +16,11 @@ const codeToCard = (code: string): Card => {
 }
 
 @Component({
-  selector: 'app-uno-grid',
-  templateUrl: './uno-grid.component.html',
-  styleUrls: ['./uno-grid.component.scss']
+  selector: 'app-ein-grid',
+  templateUrl: './ein-grid.component.html',
+  styleUrls: ['./ein-grid.component.scss']
 })
-export class UnoGridComponent implements OnInit {
+export class EinGridComponent implements OnInit {
 
   constructor(private warnings: WarningsService, private consoleService: ConsoleService) {
     this.clearBoard();

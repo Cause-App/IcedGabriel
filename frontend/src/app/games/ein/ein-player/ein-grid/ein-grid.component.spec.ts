@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SnakeOptionsComponent } from './snake-options.component';
+import { EinGridComponent } from './ein-grid.component';
 
-describe('SnakeOptionsComponent', () => {
-  let component: SnakeOptionsComponent;
-  let fixture: ComponentFixture<SnakeOptionsComponent>;
+describe('EinGridComponent', () => {
+  let component: EinGridComponent;
+  let fixture: ComponentFixture<EinGridComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SnakeOptionsComponent ]
+      declarations: [ EinGridComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SnakeOptionsComponent);
+    fixture = TestBed.createComponent(EinGridComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

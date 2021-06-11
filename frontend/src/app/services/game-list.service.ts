@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { SnakeOptionsComponent } from '../games/snake/snake-options/snake-options.component';
 import { SnakePlayerComponent } from '../games/snake/snake-player/snake-player.component';
-import { UnoOptionsComponent } from '../games/uno/uno-options/uno-options.component';
-import { UnoPlayerComponent } from '../games/uno/uno-player/uno-player.component';
+import { EinOptionsComponent } from '../games/ein/ein-options/ein-options.component';
+import { EinPlayerComponent } from '../games/ein/ein-player/ein-player.component';
 
 export interface CodeFile {
   filename: string;
@@ -75,7 +75,11 @@ public class Snake implements Slitherable {
         }
       ]
     },
+<<<<<<< HEAD
     { name: "Ein", id: "ein", available: false, optionsComponent: UnoOptionsComponent, playerComponent: UnoPlayerComponent, defaultCode: [
+=======
+    { name: "Ein", id: "ein", available: true, optionsComponent: EinOptionsComponent, playerComponent: EinPlayerComponent, defaultCode: [
+>>>>>>> uno
       {
         filename: "EinPlayer.java",
         protected: true,

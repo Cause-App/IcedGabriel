@@ -67,7 +67,7 @@ router.get("/mine", requireLogin, (req, res) => {
     });
 });
 
-router.get("/getallsnakes", requireLogin, (req, res) => {
+router.get("/getallplayers", requireLogin, (req, res) => {
     const snakeCollection = db.db.collection("snake");
 
     snakeCollection.find().project({ code: false }).toArray((err, docs) => {
@@ -80,7 +80,7 @@ router.get("/getallsnakes", requireLogin, (req, res) => {
     });
 });
 
-router.post("/editsnake", requireLogin, (req, res) => {
+router.post("/editplayer", requireLogin, (req, res) => {
     const snakeCollection = db.db.collection("snake");
 
     const id = req.body.id && req.body.id !== "undefined" ? req.body.id : undefined;
@@ -171,7 +171,7 @@ router.post("/editsnake", requireLogin, (req, res) => {
     }
 });
 
-router.get("/deletesnake", requireLogin, (req, res) => {
+router.get("/deleteplayer", requireLogin, (req, res) => {
     const snakeCollection = db.db.collection("snake");
     const snakeLbCollection = db.db.collection("snakeleaderboard");
 

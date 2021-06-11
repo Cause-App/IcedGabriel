@@ -5,6 +5,7 @@ const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
 const fs = require("fs");
+const { games } = require("./games");
 require("dotenv").config();
 
 const port = process.env.PORT || 8000;
@@ -26,10 +27,9 @@ app.use(express.urlencoded({ extended: true }));
 
 const router = express.Router();
 
-const {snakeRouter, snakeSocketHandlers} = require("./games/snake");
-const {unoRouter, unoSocketHandlers} = require("./games/ein");
-router.use("/api/snake", snakeRouter);
-router.use("/api/ein", unoRouter);
+for (const game of games) {
+    router.use(`/api/${game.id}`, game.router);
+}
 
 app.use(router);
 
@@ -45,15 +45,15 @@ app.all('*', function (req, res) {
     res.status(200).sendFile(`/`, { root: _app_folder });
 });
 
-if (fs.existsSync("./RunningGames")){
+if (fs.existsSync("./RunningGames")) {
     fs.rmSync("./RunningGames", { recursive: true, force: true });
 }
 
 fs.mkdirSync("./RunningGames");
 
-db.client.connect(function(err) {
+db.client.connect(function (err) {
     if (err) {
-        console.err(err);
+        console.error(err);
         return;
     }
 
@@ -64,7 +64,8 @@ db.client.connect(function(err) {
     });
 
     io.on("connection", (socket) => {
-        snakeSocketHandlers(socket);
-        unoSocketHandlers(socket);
+        for (const game of games) {
+            game.socketHandlers(socket);
+        }
     });
 });
