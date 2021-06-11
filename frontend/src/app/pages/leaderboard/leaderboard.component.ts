@@ -34,7 +34,7 @@ export class LeaderboardComponent implements OnInit {
     this.route.params.subscribe(async params => {
       const gameID = params['id'];
       this.game = this.gameList.gameWithID(gameID);
-      if (!this.game) {
+      if (!this.game || !this.game.available) {
         this.router.navigate(["/"]);
       }
       this.leaderboard = await this.api.get(`${this.game?.id}/leaderboard`, {}) as any;
