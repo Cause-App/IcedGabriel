@@ -29,6 +29,8 @@ import { UnoGridComponent } from './games/uno/uno-player/uno-grid/uno-grid.compo
 import { ConsoleComponent } from './widgets/console/console.component';
 import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component';
 import { SnakePreviewComponent } from './widgets/3d/snake-preview/snake-preview.component';
+import { GameOptionsComponent } from './games/generic/game-options/game-options.component';
+import { GamePlayerComponent } from './games/generic/game-player/game-player.component';
 
 const socketConfig: SocketIoConfig = { url: '/', options: {} };
 
@@ -70,7 +72,9 @@ export function storageFactory(): OAuthStorage {
     UnoGridComponent,
     ConsoleComponent,
     LeaderboardComponent,
-    SnakePreviewComponent
+    SnakePreviewComponent,
+    GameOptionsComponent,
+    GamePlayerComponent
   ],
   imports: [
     BrowserModule,

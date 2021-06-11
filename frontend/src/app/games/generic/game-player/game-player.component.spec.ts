@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UnoPlayerComponent } from './uno-player.component';
+import { GamePlayerComponent } from './game-player.component';
 
-describe('SnakePlayerComponent', () => {
-  let component: UnoPlayerComponent;
-  let fixture: ComponentFixture<UnoPlayerComponent>;
+describe('GamePlayerComponent', () => {
+  let component: GamePlayerComponent;
+  let fixture: ComponentFixture<GamePlayerComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UnoPlayerComponent ]
+      declarations: [ GamePlayerComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UnoPlayerComponent);
+    fixture = TestBed.createComponent(GamePlayerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
