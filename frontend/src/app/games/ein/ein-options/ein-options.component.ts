@@ -3,11 +3,11 @@ import { GameOptionsComponent } from '../../generic/game-options/game-options.co
 
 
 @Component({
-  selector: 'app-uno-options',
+  selector: 'app-ein-options',
   templateUrl: '../../generic/game-options/game-options.component.html',
   styleUrls: ['../../generic/game-options/game-options.component.scss']
 })
-export class UnoOptionsComponent extends GameOptionsComponent {
+export class EinOptionsComponent extends GameOptionsComponent {
   
   gameID = "ein";
   defaultPlayerName = "An unnamed Ein player";

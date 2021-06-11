@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UnoGridComponent } from './uno-grid.component';
+import { EinGridComponent } from './ein-grid.component';
 
-describe('SnakeGridComponent', () => {
-  let component: UnoGridComponent;
-  let fixture: ComponentFixture<UnoGridComponent>;
+describe('EinGridComponent', () => {
+  let component: EinGridComponent;
+  let fixture: ComponentFixture<EinGridComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ UnoGridComponent ]
+      declarations: [ EinGridComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(UnoGridComponent);
+    fixture = TestBed.createComponent(EinGridComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
