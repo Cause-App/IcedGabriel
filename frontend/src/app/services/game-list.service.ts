@@ -75,7 +75,7 @@ public class Snake implements Slitherable {
         }
       ]
     },
-    { name: "Ein", id: "ein", available: true, optionsComponent: EinOptionsComponent, playerComponent: EinPlayerComponent, defaultCode: [
+    { name: "Ein", id: "ein", available: false, optionsComponent: EinOptionsComponent, playerComponent: EinPlayerComponent, defaultCode: [
       {
         filename: "EinPlayer.java",
         protected: true,
