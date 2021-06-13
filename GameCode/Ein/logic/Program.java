@@ -1,5 +1,6 @@
 package logic;
 
+import java.awt.event.MouseAdapter;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -8,7 +9,10 @@ public class Program {
 
 	private static int MOVE_MAX_MILLIS;
 
-	private static class OutOfCardsException extends RuntimeException {};
+	private static class OutOfCardsException extends RuntimeException {
+	}
+
+	;
 
 	private static class PlayerThread implements Runnable {
 		private final Game game;
@@ -56,13 +60,13 @@ public class Program {
 	static class Game {
 		private static final int CARDS_PER_HAND = 7;
 
-		private final LinkedList<Card> deck;
-		private final List<Card> s1Hand;
-		private final List<Card> s2Hand;
+		final LinkedList<Card> deck;
+		final List<Card> s1Hand;
+		final List<Card> s2Hand;
 
-		private Card lastPlayedCard;
+		Card lastPlayedCard;
 		private List<Card> played;
-		private boolean s1Turn;
+		boolean s1Turn;
 
 		public Card move;
 		private int mustPickUp2;
@@ -89,15 +93,15 @@ public class Program {
 
 		public Game() {
 			deck = new LinkedList<>();
-			for (Card.Suit s: new Card.Suit[]{Card.Suit.RED, Card.Suit.GREEN, Card.Suit.YELLOW, Card.Suit.BLUE}) {
+			for (Card.Suit s : new Card.Suit[]{Card.Suit.RED, Card.Suit.GREEN, Card.Suit.YELLOW, Card.Suit.BLUE}) {
 				deck.add(new Card(Card.Value.ZERO, s));
-				for (Card.Value v: new Card.Value[]{Card.Value.ONE, Card.Value.TWO, Card.Value.THREE, Card.Value.FOUR, Card.Value.FIVE, Card.Value.SIX, Card.Value.SEVEN, Card.Value.EIGHT, Card.Value.NINE, Card.Value.DRAW2, Card.Value.SKIP, Card.Value.REVERSE}) {
+				for (Card.Value v : new Card.Value[]{Card.Value.ONE, Card.Value.TWO, Card.Value.THREE, Card.Value.FOUR, Card.Value.FIVE, Card.Value.SIX, Card.Value.SEVEN, Card.Value.EIGHT, Card.Value.NINE, Card.Value.DRAW2, Card.Value.SKIP, Card.Value.REVERSE}) {
 					deck.add(new Card(v, s));
 					deck.add(new Card(v, s));
 				}
 			}
-			for (Card.Value v: new Card.Value[]{Card.Value.DRAW4, Card.Value.CHANGECOLOR}) {
-				for (int i=0; i<4; i++) {
+			for (Card.Value v : new Card.Value[]{Card.Value.DRAW4, Card.Value.CHANGECOLOR}) {
+				for (int i = 0; i < 4; i++) {
 					deck.add(new Card(v, Card.Suit.WILD));
 				}
 			}
@@ -106,9 +110,9 @@ public class Program {
 			s1Hand = new ArrayList<>();
 			s2Hand = new ArrayList<>();
 			s1Turn = new Random().nextBoolean();
-			List<Card> h1 = s1Turn? s2Hand: s1Hand;
-			List<Card> h2 = s1Turn? s1Hand: s2Hand;
-			for (int i=0; i<CARDS_PER_HAND; i++) {
+			List<Card> h1 = s1Turn ? s2Hand : s1Hand;
+			List<Card> h2 = s1Turn ? s1Hand : s2Hand;
+			for (int i = 0; i < CARDS_PER_HAND; i++) {
 				h1.add(deal());
 				h2.add(deal());
 			}
@@ -155,7 +159,7 @@ public class Program {
 		public Card pickUpIfCantMove() {
 			List<Card> hand = s1Turn ? s1Hand : s2Hand;
 			boolean hasOptions = false;
-			for (Card c: hand) {
+			for (Card c : hand) {
 				if (moveValid(c)) {
 					hasOptions = true;
 					break;
@@ -186,7 +190,7 @@ public class Program {
 			if (move.value == Card.Value.DRAW2) {
 				mustPickUp2 += 1;
 				boolean canBeCountered = false;
-				for (Card x: otherHand) {
+				for (Card x : otherHand) {
 					if (x.value == Card.Value.DRAW2) {
 						canBeCountered = true;
 						break;
@@ -195,7 +199,7 @@ public class Program {
 				if (canBeCountered) {
 					s1Turn = !s1Turn;
 				} else {
-					for (int i=0; i<mustPickUp2*2; i++) {
+					for (int i = 0; i < mustPickUp2 * 2; i++) {
 						Card c = deal();
 						otherHand.add(c);
 						drawn.add(c);
@@ -205,7 +209,7 @@ public class Program {
 			} else if (move.value == Card.Value.DRAW4) {
 				mustPickUp4 += 1;
 				boolean canBeCountered = false;
-				for (Card x: otherHand) {
+				for (Card x : otherHand) {
 					if (x.value == Card.Value.DRAW4) {
 						canBeCountered = true;
 						break;
@@ -214,7 +218,7 @@ public class Program {
 				if (canBeCountered) {
 					s1Turn = !s1Turn;
 				} else {
-					for (int i=0; i<mustPickUp4*4; i++) {
+					for (int i = 0; i < mustPickUp4 * 4; i++) {
 						Card c = deal();
 						otherHand.add(c);
 						drawn.add(c);
@@ -229,6 +233,21 @@ public class Program {
 			}
 			return drawn;
 		}
+	}
+
+	private static Window window;
+
+	public static void addMouseListener(MouseAdapter ma) {
+		if (window != null) {
+			window.addMouseListener(ma);
+		}
+	}
+
+	public static int getClickedCardIndex(boolean player1, int x, int y) {
+		if (window != null) {
+			return window.getClickedCardIndex(player1, x, y);
+		}
+		return -1;
 	}
 
 	private static String encode(String x) {
@@ -246,12 +265,12 @@ public class Program {
 
 	public static void main(String[] args) {
 		if (args.length < 3) {
-			System.err.println("Expected 3 arguments but only received "+args.length);
+			System.err.println("Expected 3 arguments but only received " + args.length);
 			System.exit(1);
 		}
 
 		MOVE_MAX_MILLIS = Integer.parseInt(args[0]);
-		float fps = Integer.parseInt(args[1]);
+		float fps = Float.parseFloat(args[1]);
 		graphical = fps > 0;
 		int numberOfGames = Integer.parseInt(args[2]);
 		boolean ranked = numberOfGames >= 0;
@@ -262,10 +281,10 @@ public class Program {
 
 		String log = "";
 
-		Window window = null;
+		window = null;
 
 		if (graphical) {
-			window = Window.newWindow();
+			window = Window.newWindow(Math.round(1000 / fps));
 		}
 
 		ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -279,54 +298,69 @@ public class Program {
 			int wins = 0;
 			int loses = 0;
 			int draws = 0;
-			for (int gameNum=0; gameNum < numberOfGames; gameNum++) {
-				game = new Game();
+			for (int gameNum = 0; gameNum < numberOfGames; gameNum++) {
 
 				if (window != null) {
-					window.setGame(game);
 					lock = true;
 					window.repaint();
+
 				}
 
 				while (lock) {
 					Thread.sleep(1);
 				}
 
+
+				game = new Game();
+
+				if (window != null) {
+					window.setGame(game);
+					window.repaint();
+				}
+
 				PlayerThread s1 = new PlayerThread(game, new einplayer1.EinPlayer(), true);
 				PlayerThread s2 = new PlayerThread(game, new einplayer2.EinPlayer(), false);
 
 
-				log += game.deck.size()+","+game.s1Hand.size()+","+game.s2Hand.size();
+				log += game.deck.size() + "," + game.s1Hand.size() + "," + game.s2Hand.size();
 
-				for (Card c: game.s1Hand) {
-					log += ","+c;
+				for (Card c : game.s1Hand) {
+					log += "," + c;
 				}
 
-				log += ","+ game.lastPlayedCard;
+				log += "," + game.lastPlayedCard;
 				log += game.s1Turn ? ",1" : ",2";
 
 				Card p;
 				do {
 					boolean s1Turn = game.s1Turn;
 					p = game.pickUpIfCantMove();
+
+					if (window != null) {
+						if (p != null) {
+							window.animate(p, s1Turn, true);
+						}
+						while (window.animating != null) {
+							Thread.sleep(1);
+							window.repaint();
+						}
+					}
 					if (p != null) {
 						if (s1Turn) {
-							log += ","+p;
+							log += "," + p;
 						} else {
 							log += ",1";
 						}
 					}
+
 				} while (p != null);
 
 				log += ",0";
 
 				do {
-					if (window != null) {
-						window.repaint();
-					}
 					game.newRound();
 					over = true;
-					Future future = executor.submit(game.s1Turn ? s1: s2);
+					Future future = executor.submit(game.s1Turn ? s1 : s2);
 					try {
 						future.get(MOVE_MAX_MILLIS, TimeUnit.MILLISECONDS);
 					} catch (TimeoutException | InterruptedException | ExecutionException e) {
@@ -342,46 +376,80 @@ public class Program {
 					}
 
 					if (!graphical && game.s1Out.length() > 0) {
-						s1Out += ""+rounds+":"+encode(game.s1Out)+"\n";
+						s1Out += "" + rounds + ":" + encode(game.s1Out) + "\n";
 					}
 
-					log+=","+game.move;
+
+					log += "," + game.move;
 
 					if (!game.moveValid()) {
 						if (game.s1Turn) {
-							log += ",0,"+game.deck.size()+",0,2";
+							log += ",0," + game.deck.size() + ",0,2";
 							loses++;
 						} else {
-							log += ",0,"+game.deck.size()+",0,1";
+							log += ",0," + game.deck.size() + ",0,1";
 							wins++;
 						}
 					} else {
 						try {
 							boolean s1TurnAtStart = game.s1Turn;
 							List<Card> drawn = game.makeMove();
+							if (window != null) {
+								window.animate(game.move, s1TurnAtStart, false, drawn.size());
+								while (window.animating != null) {
+									Thread.sleep(1);
+									window.repaint();
+								}
+							}
+
 							if (game.s1Hand.size() == 0) {
-								log += ",0,"+game.deck.size()+",0,1";
+								log += ",0," + game.deck.size() + ",0,1";
 								wins++;
 							} else if (game.s2Hand.size() == 0) {
-								log += ",0,"+game.deck.size()+",0,2";
+								log += ",0," + game.deck.size() + ",0,2";
 								loses++;
 							} else {
 								Card q;
+								int hideCount = drawn.size();
 								if (s1TurnAtStart) {
-									for (Card c: drawn) {
+									for (Card c : drawn) {
+										if (window != null) {
+											window.animate(c, false, true, hideCount--);
+											while (window.animating != null) {
+												Thread.sleep(1);
+												window.repaint();
+											}
+										}
 										log += ",1";
 									}
 								} else {
-									for (Card c: drawn) {
-										log += ","+c;
+									for (Card c : drawn) {
+										if (window != null) {
+											window.animate(c, true, true, hideCount--);
+											while (window.animating != null) {
+												Thread.sleep(1);
+												window.repaint();
+											}
+										}
+										log += "," + c;
 									}
 								}
 								do {
 									boolean s1Turn = game.s1Turn;
 									q = game.pickUpIfCantMove();
+
+									if (window != null) {
+										if (q != null) {
+											window.animate(q, s1Turn, true);
+										}
+										while (window.animating != null) {
+											Thread.sleep(1);
+											window.repaint();
+										}
+									}
 									if (q != null) {
 										if (s1Turn) {
-											log += ","+q;
+											log += "," + q;
 										} else {
 											log += ",1";
 										}
@@ -389,7 +457,7 @@ public class Program {
 								} while (q != null);
 								log += ",0";
 
-								log += ","+game.deck.size();
+								log += "," + game.deck.size();
 								log += game.s1Turn ? ",1" : ",2";
 								over = false;
 							}
@@ -403,11 +471,11 @@ public class Program {
 
 				if (!ranked && !graphical) {
 					System.out.println(log);
-					System.out.print(s1Out.substring(0, Math.max(0,s1Out.length()-1)));
+					System.out.print(s1Out.substring(0, Math.max(0, s1Out.length() - 1)));
 				}
 			}
 			if (ranked && !graphical) {
-				System.out.print(""+wins+","+loses+","+draws);
+				System.out.print("" + wins + "," + loses + "," + draws);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

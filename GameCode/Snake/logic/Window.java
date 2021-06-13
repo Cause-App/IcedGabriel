@@ -101,12 +101,22 @@ public class Window extends JPanel {
 
 
 		if (Program.lock) {
-			Font font = new Font(Font.SANS_SERIF, Font.BOLD, Math.min(50, getWidth()/10));
-			g2d.setColor(Color.BLACK);
+			Font font = new Font(Font.SANS_SERIF, Font.PLAIN, Math.min(50, frame.getWidth()/10));
 			g2d.setFont(font);
 			String label = "Press Space to Start";
 			Rectangle2D r2d = font.getStringBounds(label, new FontRenderContext(null, false, true));
-			g2d.drawString(label, Math.round((getWidth()-r2d.getWidth())/2 - r2d.getX()), Math.round((getHeight()-r2d.getHeight())/2 - r2d.getY()));
+
+			int tx =  (int) Math.round((frame.getWidth()-r2d.getWidth())/2);
+			int ty = (int) Math.round((frame.getContentPane().getHeight()-r2d.getHeight())/2);
+			int xPadding = 50;
+			int yPadding = 10;
+			int borderRadius = 30;
+
+			g2d.setColor(new Color(0, 0, 0, 128));
+			g2d.fillRoundRect(tx-xPadding, ty-yPadding, 2*xPadding+(int) r2d.getWidth(), 2*yPadding+(int) r2d.getHeight(), borderRadius, borderRadius);
+
+			g2d.setColor(Color.WHITE);
+			g2d.drawString(label, tx - (int)r2d.getX(), ty - (int)r2d.getY());
 		}
 	}
 
