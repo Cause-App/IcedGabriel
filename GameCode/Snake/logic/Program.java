@@ -1,16 +1,15 @@
 package logic;
 
+import java.awt.event.KeyAdapter;
 import java.io.*;
 import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.*;
 
-import logic.Direction;
-
 public class Program {
 
-	private static int GRID_WIDTH;
-	private static int GRID_HEIGHT;
+	static int GRID_WIDTH;
+	static int GRID_HEIGHT;
 	private static int SNAKE_MOVE_MAX_MILLIS;
 	private static int MAX_ROUNDS;
 
@@ -33,8 +32,10 @@ public class Program {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 			try (PrintStream ps = new PrintStream(baos)) {
-				System.setOut(ps);
-				System.setErr(ps);
+				if (!Program.graphical) {
+					System.setOut(ps);
+					System.setErr(ps);
+				}
 				int myX, myY, enemyX, enemyY;
 				if (s1) {
 					myX = game.s1x;
@@ -59,7 +60,7 @@ public class Program {
 			} finally {
 				System.setOut(stdout);
 				System.setErr(stderr);
-				if (s1) {
+				if (s1 && !Program.graphical) {
 					game.s1Out = baos.toString();
 				}
 			}
@@ -158,7 +159,7 @@ public class Program {
 
 	}
 
-	private static class Grid {
+	static class Grid {
 
 		enum Tile {
 			EMPTY, SNAKE1, SNAKE2, APPLE
@@ -238,7 +239,192 @@ public class Program {
 		return x.replace("\r", "").replace("&", "&amp;").replace("\n", "&newline;").replace(":", "&colon;");
 	}
 
+	public static Window window;
+
 	private static Game game;
+
+	static boolean graphical;
+
+	public static void addKeyListener(KeyAdapter k){
+		if (graphical && window != null) {
+			window.frame.addKeyListener(k);
+		}
+	}
+
+	static boolean lock = false;
+
+	private static void playOneGame() {
+		game = new Game();
+
+		if (window != null) {
+			window.setGrid(game.grid);
+		}
+
+		SnakeThread s1 = new SnakeThread(game, new snake1.Snake(), true);
+		SnakeThread s2 = new SnakeThread(game, new snake2.Snake(), false);
+
+		boolean over;
+
+		log += GRID_WIDTH+","+GRID_HEIGHT+","+game.s1x+","+game.s1y+","+game.s2x+","+game.s2y+","+game.ax+","+game.ay;
+		do {
+			if (window != null) {
+				window.repaint();
+				try {
+					Thread.sleep(Math.round(1000 / fps));
+				}
+				catch (InterruptedException e) {
+				}
+			}
+			over = true;
+			game.newRound();
+			Future f1 = executor.submit(s1);
+			try {
+				f1.get(SNAKE_MOVE_MAX_MILLIS, TimeUnit.MILLISECONDS);
+			} catch (TimeoutException | InterruptedException | ExecutionException e) {
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				e.printStackTrace(pw);
+				game.s1Out += sw.toString();
+				f1.cancel(true);
+			}
+
+			if (!graphical && game.s1Out.length() > 0) {
+				s1Out += ""+rounds+":"+encode(game.s1Out)+"\n";
+			}
+
+			Future f2 = executor.submit(s2);
+			try {
+				f2.get(SNAKE_MOVE_MAX_MILLIS, TimeUnit.MILLISECONDS);
+			} catch (TimeoutException | InterruptedException | ExecutionException e) {
+				f2.cancel(true);
+			}
+
+			log+=","+dirToInt(game.s1Move)+","+dirToInt(game.s2Move);
+
+			if (game.s1Move == null && game.s2Move == null) {
+				log += ",0";
+				draws++;
+			} else if (game.s1Move == null) {
+				log += ",2";
+				loses++;
+			} else if (game.s2Move == null) {
+				log += ",1";
+				wins++;
+			} else {
+				int ns1x = game.s1x + GRID_WIDTH;
+				int ns1y = game.s1y + GRID_HEIGHT;
+				Direction d1 = game.s1Move;
+				if (d1 == Direction.UP) {
+					ns1y--;
+				} else if (d1 == Direction.RIGHT) {
+					ns1x++;
+				} else if (d1 == Direction.DOWN) {
+					ns1y++;
+				} else if (d1 == Direction.LEFT) {
+					ns1x--;
+				}
+
+				int ns2x = game.s2x + GRID_WIDTH;
+				int ns2y = game.s2y + GRID_HEIGHT;
+				Direction d2 = game.s2Move;
+				if (d2 == Direction.UP) {
+					ns2y--;
+				} else if (d2 == Direction.RIGHT) {
+					ns2x++;
+				} else if (d2 == Direction.DOWN) {
+					ns2y++;
+				} else if (d2 == Direction.LEFT) {
+					ns2x--;
+				}
+
+				ns1x %= GRID_WIDTH;
+				ns1y %= GRID_HEIGHT;
+				ns2x %= GRID_WIDTH;
+				ns2y %= GRID_HEIGHT;
+
+				boolean s1Died = false;
+				boolean s2Died = false;
+				boolean gotApple = false;
+
+				if (ns1x == ns2x && ns1y == ns2y) {
+					s1Died = true;
+					s2Died = true;
+					log += ",0";
+					draws++;
+				} else {
+					Grid.Tile t1 = game.grid.get(ns1x, ns1y);
+					Grid.Tile t2 = game.grid.get(ns2x, ns2y);
+					if (t1 != Grid.Tile.APPLE) {
+						game.removeS1Tail();
+					} else {
+						gotApple = true;
+					}
+					if (t2 != Grid.Tile.APPLE) {
+						game.removeS2Tail();
+					} else {
+						gotApple = true;
+					}
+					if (t1 == Grid.Tile.SNAKE1 || t1 == Grid.Tile.SNAKE2) {
+						s1Died = true;
+					}
+					if (t2 == Grid.Tile.SNAKE1 || t2 == Grid.Tile.SNAKE2) {
+						s2Died = true;
+					}
+					game.setS1Pos(ns1x, ns1y);
+					game.setS2Pos(ns2x, ns2y);
+					if (gotApple) {
+						game.putApple();
+						log += ","+game.ax+","+game.ay;
+					} else {
+						log += ",-1,-1";
+					}
+				}
+
+				if (s1Died && !s2Died) {
+					log += ",2";
+					loses++;
+				} else if (!s1Died && s2Died) {
+					log += ",1";
+					wins++;
+				} else if (s1Died && s2Died) {
+					log += ",0";
+					draws++;
+				} else {
+					over = false;
+				}
+			}
+		} while (!over & ++rounds < MAX_ROUNDS);
+
+		if (!over) {
+			log += ",-1,-1,";
+			int longer = game.whoIsLonger();
+			if (longer == 1) {
+				log += "1";
+				wins++;
+			} else if (longer == 2) {
+				log += "2";
+				loses++;
+			} else {
+				log += "0";
+				draws++;
+			}
+		}
+		if (!ranked && !graphical) {
+			System.out.println(log);
+			System.out.print(s1Out.substring(0, Math.max(0,s1Out.length()-1)));
+		}
+	}
+
+	private static String log;
+	private static int wins;
+	private static int loses;
+	private static int draws;
+	private static boolean ranked;
+	private static String s1Out;
+	private static float fps;
+	private static int rounds;
+	private static ExecutorService executor;
+
 
 	public static void main(String[] args) {
 		if (args.length < 5) {
@@ -250,178 +436,48 @@ public class Program {
 		GRID_HEIGHT = Integer.parseInt(args[1]);
 		SNAKE_MOVE_MAX_MILLIS = Integer.parseInt(args[2]);
 		MAX_ROUNDS = Integer.parseInt(args[3]);
-		int numberOfGames = Integer.parseInt(args[4]);
-		boolean ranked = numberOfGames >= 0;
+		fps = Float.parseFloat(args[4]);
+		graphical = fps > 0;
+		int numberOfGames = Integer.parseInt(args[5]);
+		ranked = numberOfGames >= 0;
 		if (!ranked) {
 			numberOfGames = 1;
 		}
 
-		String log = "";
+		log = "";
 
-		ExecutorService executor = Executors.newSingleThreadExecutor();
+		if (graphical) {
+			window = Window.newWindow();
+		}
 
-		String s1Out = "";
+		executor = Executors.newSingleThreadExecutor();
 
-		boolean over;
-		int rounds = 0;
+		s1Out = "";
+
+		rounds = 0;
 		try {
-			int wins = 0;
-			int loses = 0;
-			int draws = 0;
+			wins = 0;
+			loses = 0;
+			draws = 0;
 			for (int gameNum=0; gameNum < numberOfGames; gameNum++) {
-				game = new Game();
-				
-				SnakeThread s1 = new SnakeThread(game, new snake1.Snake(), true);
-				SnakeThread s2 = new SnakeThread(game, new snake2.Snake(), false);
-
-				log += GRID_WIDTH+","+GRID_HEIGHT+","+game.s1x+","+game.s1y+","+game.s2x+","+game.s2y+","+game.ax+","+game.ay;
-				do {
-					over = true;
-					game.newRound();
-					Future f1 = executor.submit(s1);
-					try {
-						f1.get(SNAKE_MOVE_MAX_MILLIS, TimeUnit.MILLISECONDS);
-					} catch (TimeoutException | InterruptedException | ExecutionException e) {
-						StringWriter sw = new StringWriter();
-						PrintWriter pw = new PrintWriter(sw);
-						e.printStackTrace(pw);
-						game.s1Out += sw.toString();
-						f1.cancel(true);
-					}
-
-					if (game.s1Out.length() > 0) {
-						s1Out += ""+rounds+":"+encode(game.s1Out)+"\n";
-					}
-
-					Future f2 = executor.submit(s2);
-					try {
-						f2.get(SNAKE_MOVE_MAX_MILLIS, TimeUnit.MILLISECONDS);
-					} catch (TimeoutException | InterruptedException | ExecutionException e) {
-						f2.cancel(true);
-					}
-
-					log+=","+dirToInt(game.s1Move)+","+dirToInt(game.s2Move);
-
-					if (game.s1Move == null && game.s2Move == null) {
-						log += ",0";
-						draws++;
-					} else if (game.s1Move == null) {
-						log += ",2";
-						loses++;
-					} else if (game.s2Move == null) {
-						log += ",1";
-						wins++;
-					} else {
-						int ns1x = game.s1x + GRID_WIDTH;
-						int ns1y = game.s1y + GRID_HEIGHT;
-						Direction d1 = game.s1Move;
-						if (d1 == Direction.UP) {
-							ns1y--;
-						} else if (d1 == Direction.RIGHT) {
-							ns1x++;
-						} else if (d1 == Direction.DOWN) {
-							ns1y++;
-						} else if (d1 == Direction.LEFT) {
-							ns1x--;
-						}
-
-						int ns2x = game.s2x + GRID_WIDTH;
-						int ns2y = game.s2y + GRID_HEIGHT;
-						Direction d2 = game.s2Move;
-						if (d2 == Direction.UP) {
-							ns2y--;
-						} else if (d2 == Direction.RIGHT) {
-							ns2x++;
-						} else if (d2 == Direction.DOWN) {
-							ns2y++;
-						} else if (d2 == Direction.LEFT) {
-							ns2x--;
-						}
-
-						ns1x %= GRID_WIDTH;
-						ns1y %= GRID_HEIGHT;
-						ns2x %= GRID_WIDTH;
-						ns2y %= GRID_HEIGHT;
-
-						boolean s1Died = false;
-						boolean s2Died = false;
-						boolean gotApple = false;
-
-						if (ns1x == ns2x && ns1y == ns2y) {
-							s1Died = true;
-							s2Died = true;
-							log += ",0";
-							draws++;
-						} else {
-							Grid.Tile t1 = game.grid.get(ns1x, ns1y);
-							Grid.Tile t2 = game.grid.get(ns2x, ns2y);
-							if (t1 != Grid.Tile.APPLE) {
-								game.removeS1Tail();
-							} else {
-								gotApple = true;
-							}
-							if (t2 != Grid.Tile.APPLE) {
-								game.removeS2Tail();
-							} else {
-								gotApple = true;
-							}
-							if (t1 == Grid.Tile.SNAKE1 || t1 == Grid.Tile.SNAKE2) {
-								s1Died = true;
-							}
-							if (t2 == Grid.Tile.SNAKE1 || t2 == Grid.Tile.SNAKE2) {
-								s2Died = true;
-							}
-							game.setS1Pos(ns1x, ns1y);
-							game.setS2Pos(ns2x, ns2y);
-							if (gotApple) {
-								game.putApple();
-								log += ","+game.ax+","+game.ay;
-							} else {
-								log += ",-1,-1";
-							}
-						}
-
-						if (s1Died && !s2Died) {
-							log += ",2";
-							loses++;
-						} else if (!s1Died && s2Died) {
-							log += ",1";
-							wins++;
-						} else if (s1Died && s2Died) {
-							log += ",0";
-							draws++;
-						} else {
-							over = false;
-						}
-					}
-				} while (!over & ++rounds < MAX_ROUNDS);
-
-				if (!over) {
-					log += ",-1,-1,";
-					int longer = game.whoIsLonger();
-					if (longer == 1) {
-						log += "1";
-						wins++;
-					} else if (longer == 2) {
-						log += "2";
-						loses++;
-					} else {
-						log += "0";
-						draws++;
-					}
+				if (window != null) {
+					lock = true;
+					window.repaint();
 				}
-				if (!ranked) {
-					System.out.println(log);
-					System.out.print(s1Out.substring(0, Math.max(0,s1Out.length()-1)));
+				while (lock) {
+					Thread.sleep(1);
 				}
+				playOneGame();
 			}
-			if (ranked) {
+			if (ranked && !graphical) {
 				System.out.print(""+wins+","+loses+","+draws);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			System.exit(0);
+			if (!graphical) {
+				System.exit(0);
+			}
 		}
 
 	}

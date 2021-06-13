@@ -14,6 +14,7 @@ const games = [
             {label: "grid_height", value: 16},
             {label: "max_millis_per_move", value: 50},
             {label: "max_rounds", value: 500},
+            {label: "fps", value: 0}
         ], // Command line arguments to be passed to the Java program (not including nunber of games to be played)
         () => db.db.collection("snake"), // Player collection
         () => db.db.collection("snakeleaderboard"), // Leaderboard collection
