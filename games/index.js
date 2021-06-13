@@ -34,7 +34,8 @@ const games = [
         "./GameCode/Ein", // Path to game code
         "./policies/ein.policy", // Path to JVM policy
         [
-            {label: "max_millis_per_move", value: 50}
+            {label: "max_millis_per_move", value: 50},
+            {label: "fps", value: 0}
         ], // Command line arguments to be passed to the Java program (not including nunber of games to be played)
         () => db.db.collection("ein"), // Player collection
         () => db.db.collection("einleaderboard"), // Leaderboard collection

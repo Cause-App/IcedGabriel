@@ -281,10 +281,14 @@ public class Program {
 			try {
 				f1.get(SNAKE_MOVE_MAX_MILLIS, TimeUnit.MILLISECONDS);
 			} catch (TimeoutException | InterruptedException | ExecutionException e) {
-				StringWriter sw = new StringWriter();
-				PrintWriter pw = new PrintWriter(sw);
-				e.printStackTrace(pw);
-				game.s1Out += sw.toString();
+				if (graphical) {
+					e.printStackTrace();
+				} else {
+					StringWriter sw = new StringWriter();
+					PrintWriter pw = new PrintWriter(sw);
+					e.printStackTrace(pw);
+					game.s1Out += sw.toString();
+				}
 				f1.cancel(true);
 			}
 
@@ -427,8 +431,8 @@ public class Program {
 
 
 	public static void main(String[] args) {
-		if (args.length < 5) {
-			System.err.println("Expected 5 arguments but only received "+args.length);
+		if (args.length < 6) {
+			System.err.println("Expected 6 arguments but only received "+args.length);
 			System.exit(1);
 		}
 

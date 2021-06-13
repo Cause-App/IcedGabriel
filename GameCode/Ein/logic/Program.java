@@ -29,8 +29,10 @@ public class Program {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 			try (PrintStream ps = new PrintStream(baos)) {
-				System.setOut(ps);
-				System.setErr(ps);
+				if (!Program.graphical) {
+					System.setOut(ps);
+					System.setErr(ps);
+				}
 				List<Card> hand;
 				if (s1) {
 					hand = game.s1Hand;
@@ -44,14 +46,14 @@ public class Program {
 			} finally {
 				System.setOut(stdout);
 				System.setErr(stderr);
-				if (s1) {
+				if (s1 && !Program.graphical) {
 					game.s1Out = baos.toString();
 				}
 			}
 		}
 	}
 
-	private static class Game {
+	static class Game {
 		private static final int CARDS_PER_HAND = 7;
 
 		private final LinkedList<Card> deck;
@@ -239,14 +241,19 @@ public class Program {
 		return game.moveValid(c);
 	}
 
+	static boolean graphical;
+	static boolean lock = false;
+
 	public static void main(String[] args) {
-		if (args.length < 2) {
-			System.err.println("Expected 2 arguments but only received "+args.length);
+		if (args.length < 3) {
+			System.err.println("Expected 3 arguments but only received "+args.length);
 			System.exit(1);
 		}
 
 		MOVE_MAX_MILLIS = Integer.parseInt(args[0]);
-		int numberOfGames = Integer.parseInt(args[1]);
+		float fps = Integer.parseInt(args[1]);
+		graphical = fps > 0;
+		int numberOfGames = Integer.parseInt(args[2]);
 		boolean ranked = numberOfGames >= 0;
 		if (!ranked) {
 			numberOfGames = 1;
@@ -254,6 +261,12 @@ public class Program {
 
 
 		String log = "";
+
+		Window window = null;
+
+		if (graphical) {
+			window = Window.newWindow();
+		}
 
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -268,6 +281,16 @@ public class Program {
 			int draws = 0;
 			for (int gameNum=0; gameNum < numberOfGames; gameNum++) {
 				game = new Game();
+
+				if (window != null) {
+					window.setGame(game);
+					lock = true;
+					window.repaint();
+				}
+
+				while (lock) {
+					Thread.sleep(1);
+				}
 
 				PlayerThread s1 = new PlayerThread(game, new einplayer1.EinPlayer(), true);
 				PlayerThread s2 = new PlayerThread(game, new einplayer2.EinPlayer(), false);
@@ -298,13 +321,18 @@ public class Program {
 				log += ",0";
 
 				do {
+					if (window != null) {
+						window.repaint();
+					}
 					game.newRound();
 					over = true;
 					Future future = executor.submit(game.s1Turn ? s1: s2);
 					try {
 						future.get(MOVE_MAX_MILLIS, TimeUnit.MILLISECONDS);
 					} catch (TimeoutException | InterruptedException | ExecutionException e) {
-						if (game.s1Turn) {
+						if (graphical) {
+							e.printStackTrace();
+						} else if (game.s1Turn) {
 							StringWriter sw = new StringWriter();
 							PrintWriter pw = new PrintWriter(sw);
 							e.printStackTrace(pw);
@@ -313,7 +341,7 @@ public class Program {
 						future.cancel(true);
 					}
 
-					if (game.s1Out.length() > 0) {
+					if (!graphical && game.s1Out.length() > 0) {
 						s1Out += ""+rounds+":"+encode(game.s1Out)+"\n";
 					}
 
@@ -373,18 +401,20 @@ public class Program {
 					rounds++;
 				} while (!over);
 
-				if (!ranked) {
+				if (!ranked && !graphical) {
 					System.out.println(log);
 					System.out.print(s1Out.substring(0, Math.max(0,s1Out.length()-1)));
 				}
 			}
-			if (ranked) {
+			if (ranked && !graphical) {
 				System.out.print(""+wins+","+loses+","+draws);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			System.exit(0);
+			if (!graphical) {
+				System.exit(0);
+			}
 		}
 
 	}
