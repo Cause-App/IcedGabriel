@@ -63,3 +63,22 @@ input[type="text"] {
     }
 }
 
+.offline {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+
+    > p {
+        margin: 0.2em;
+    }
+
+    h3 {
+        margin-bottom: 0.2em;
+    }
+
+    a {
+        color: inherit;
+        font-weight: bold;
+    }
+}

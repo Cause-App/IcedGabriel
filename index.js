@@ -4,7 +4,9 @@ const express = require("express");
 const app = express();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
+const archiver = require("archiver");
 const fs = require("fs");
+const path = require("path");
 const { games } = require("./games");
 require("dotenv").config();
 
@@ -29,6 +31,35 @@ const router = express.Router();
 
 for (const game of games) {
     router.use(`/api/${game.id}`, game.router);
+}
+
+if (fs.existsSync("./ZippedGameCode")) {
+    fs.rmSync("./ZippedGameCode", { recursive: true, force: true });
+}
+
+fs.mkdirSync("./ZippedGameCode");
+fs.mkdirSync("./ZippedGameCode/Game");
+fs.mkdirSync("./ZippedGameCode/Player");
+
+for (const game of games) {
+    for (const [baseDir, outDir, suffix] of [["./GameCode", "Game", ""], ["./DefaultPlayers", "Player", "-template-player"]]) {
+        const p = path.join("./ZippedGameCode", outDir, game.id + suffix + ".zip");
+        const output = fs.createWriteStream(p);
+        const archive = archiver("zip");
+
+        output.on("close", function () {
+            console.log(`Finished archiving ${p}`);
+        });
+
+        archive.on("error", (err) => {
+            throw err;
+        });
+
+        archive.pipe(output);
+        archive.directory(path.join(baseDir, game.id), false);
+
+        archive.finalize();
+    }
 }
 
 app.use(router);

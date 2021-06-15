@@ -21,6 +21,12 @@
     <div class="rank-slider" [ngStyle]="rankSliderStyle()"></div>
     <div class="queue" *ngIf="rankQueue >= 0">There {{rankQueue === 1? 'is': 'are'}} {{rankQueue}} {{rankQueue === 1?
         'game': 'games'}} ahead of you in the game queue</div>
-    <div class="queue" *ngIf="rankResult >= 0">You came {{rankResult}}{{suffix(rankResult)}} out of {{leaderboardSize}}</div>
+    <div class="queue" *ngIf="rankResult >= 0">You came {{rankResult}}{{suffix(rankResult)}} out of {{leaderboardSize}}
+    </div>
     <button *ngIf="cancellable" class="button1" (click)="cancelRank()">Cancel</button>
+</div>
+<div class="offline">
+    <h3>Want to play offline?</h3>
+    <p>{{offlineString}}</p>
+    <p>Click <a target="_blank" [href]="'/offline/'+gameID">here</a> for instructions</p>
 </div>

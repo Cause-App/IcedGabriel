@@ -11,5 +11,6 @@ export class EinOptionsComponent extends GameOptionsComponent {
   
   gameID = "ein";
   defaultPlayerName = "An unnamed Ein player";
- 
+  offlineString: string = "Or use the mouse to play against your own code?"
+
 }

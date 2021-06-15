@@ -66,6 +66,7 @@ export class GameOptionsComponent implements OnInit {
     this.save();
     this.onIdChanged(this.playerID);
   }
+  offlineString: string = ""
 
   private saveCooldown: number = 1000;
   private saveInterrupted: number = 0;

@@ -7,8 +7,6 @@ const games = [
         1024 * 1024 * 2, // Initial heap size 
         1024 * 1024 * 64, // Max heap size
         1024 * 512, // Thread stack size
-        "./GameCode/Snake", // Path to game code
-        "./policies/snake.policy", // Path to JVM policy
         [
             {label: "grid_width", value: 16},
             {label: "grid_height", value: 16},
@@ -31,8 +29,6 @@ const games = [
         1024 * 1024 * 2, // Initial heap size 
         1024 * 1024 * 64, // Max heap size
         1024 * 512, // Thread stack size
-        "./GameCode/Ein", // Path to game code
-        "./policies/ein.policy", // Path to JVM policy
         [
             {label: "max_millis_per_move", value: 50},
             {label: "fps", value: 0}

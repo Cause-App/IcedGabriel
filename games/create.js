@@ -25,8 +25,6 @@ const createGame = (
     initialHeapSize,
     maxHeapSize,
     threadStackSize,
-    codePath,
-    policyPath,
     args,
     playerCollection,
     leaderboardCollection,
@@ -38,6 +36,17 @@ const createGame = (
     numberOfRankedGames
 ) => {
     const router = express.Router();
+    const codePath = path.join("./GameCode", id);
+    const policyPath = path.join("./policies", id+".policy");
+
+    router.get("/offline", (req, res) => {
+        res.download(path.join("./ZippedGameCode", "Game", id+".zip"));
+    });
+
+    router.get("/offlineplayer", (req, res) => {
+        res.download(path.join("./ZippedGameCode", "Player", id+"-template-player.zip"));
+    });
+
 
     router.get("/leaderboard", async (req, res) => {
         const lbCollection = leaderboardCollection();

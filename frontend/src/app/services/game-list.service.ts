@@ -18,6 +18,12 @@ export interface Game {
   defaultCode?: CodeFile[];
   optionsComponent?: any;
   playerComponent?: any;
+  package1?: string;
+  package2?: string;
+  playerSingular?: string;
+  playerPlural?: string;
+  offlineControls?: string;
+  params?: string;
 };
 
 @Injectable({
@@ -29,7 +35,7 @@ export class GameListService {
 
   games: Game[] = [
     {
-      name: "Snake", id: "snake", available: true, optionsComponent: SnakeOptionsComponent, playerComponent: SnakePlayerComponent, defaultCode: [
+      name: "Snake", id: "snake", available: true, optionsComponent: SnakeOptionsComponent, playerComponent: SnakePlayerComponent, package1: "snake1", package2: "snake2", playerSingular: "snake", playerPlural: "snakes", defaultCode: [
         {
           filename: "Snake.java",
           protected: true,
@@ -73,13 +79,15 @@ public class Snake implements Slitherable {
   
 }`
         }
-      ]
+      ], offlineControls: "use the arrow keys or WASD to control the other snake",
+      params: "You must provide 6 parameters. The first two are the grid width and height respectively. You should set these both to 16. The next is the number of milliseconds which each snake is allowed to take in order to make its decision. A good value for this is 200. The next is the maximum number of rounds a game can have before the longest snake wins by default. This should be set to 1000. The fifth parameter is the number of turns per second the game should play at. You can modify this number to help you debug your snake, but a good default is 10. The final number is the number of games to be played. Set this to something big, like 1000."
     },
-    { name: "Ein", id: "ein", available: false, optionsComponent: EinOptionsComponent, playerComponent: EinPlayerComponent, defaultCode: [
-      {
-        filename: "EinPlayer.java",
-        protected: true,
-        code: `import logic.EinPlayerInterface;
+    {
+      name: "Ein", id: "ein", available: false, optionsComponent: EinOptionsComponent, playerComponent: EinPlayerComponent, package1: "einplayer1", package2: "einplayer2", playerSingular: "player", playerPlural: "players", defaultCode: [
+        {
+          filename: "EinPlayer.java",
+          protected: true,
+          code: `import logic.EinPlayerInterface;
 import logic.Card;
 
 public class EinPlayer implements EinPlayerInterface {
@@ -186,8 +194,10 @@ public class EinPlayer implements EinPlayerInterface {
     }
 
 }`
-      }
-    ] },
+        }
+      ], offlineControls: "use the mouse to select which card to play",
+      params: "You must provide 3 parameters. The first is the number of milliseconds each player can take to make its decision. If one of your players is using the mouse to make a selection, set this to be something very big like 200000000. The next parameter is the animation speed. You can mess around with this parameter to help with debugging your code, but a good default value is 3. The next parameter is the number of games to be played. Set this to something big like 100."
+    },
     { name: "Monopoly", id: "monopoly", available: false },
   ]
 
@@ -202,7 +212,7 @@ public class EinPlayer implements EinPlayerInterface {
     if (!game.available) {
       return;
     }
-    window.location.href = "/game/"+game.id;
+    window.location.href = "/game/" + game.id;
   }
 
   gameWithID(id: string): Game | undefined {

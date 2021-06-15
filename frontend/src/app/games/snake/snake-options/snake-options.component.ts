@@ -15,6 +15,6 @@ export class SnakeOptionsComponent extends GameOptionsComponent {
   deletePlayerString: string = "Delete This Snake"
   renamePlayerString: string = "Rename Snake"
   deletePrompt: (code: string) => string = (code: string) => `Are you sure you want to delete this snake? You will be unable to play as this player; others will be unable to play against this snake; its rank in the leaderboard will be lost. This action is irreversible. Please enter '${code}' to confirm`;
-
+  offlineString: string = "Or use the keyboard to play against your own snake?"
  
 }

@@ -1,0 +1,96 @@
+<div class="content" *ngIf="game">
+    <div class="title">
+        <h1>Play {{game.name}} Offline</h1>
+        <img class="preview" [src]="'/assets/previews/'+game.id+'.png'" [alt]="game.name"
+            onerror="this.classList.add('none')">
+    </div>
+    <div class="instructions">
+        <p>
+            This page will show you step-by-step how to play {{game.name}} offline on your own computer. This guide will
+            show you how to do this using IntelliJ 2021.1. These instructions work on Windows, Mac, and Linux.
+        </p>
+        <p>
+            First make sure you have Java JRE and JDK installed. To install the JRE, go to <a
+                href="https://www.java.com/en/download/manual.jsp"
+                target="_blank">https://www.java.com/en/download/manual.jsp</a> in your web browser. Navigate to the
+            section of the page relevant to your operating system, and select one of listed the installers. Advice
+            exists on this page to help you decide which one to select, and how to execute your chosen installer.
+        </p>
+        <p>
+            To install the JDK, go to <a href="https://www.oracle.com/java/technologies/javase-jdk16-downloads.html"
+                target="_blank">https://www.oracle.com/java/technologies/javase-jdk16-downloads.html</a> in your
+            browser.
+            Again select the installer which is appropriate for your operating system, and execute this installer.
+        </p>
+        <p>
+            Once you have installed the JRE and the JDK, make sure you add the "java" and "javac" executables to your
+            system path.
+        </p>
+        <section>
+            <h3>Running In IntelliJ</h3>
+            <p>
+                In IntelliJ, select <i>File &rarr; New &rarr; Project...</i> to open the "New Project" menu. Here,
+                Select
+                "Java" from the left panel, and set the Project SDK to your Java installation.
+            </p>
+            <img src="/assets/offline/intellij/newproject.png" alt="New Project menu">
+            <p>
+                Click "Next" twice, and then give the project any name you'd like, and choose where you'd like to save
+                it.
+            </p>
+            <p>
+                Then, click "Finish". You will see that a project is created with a folder called "src".
+            </p>
+            <p>
+                Click <a download [href]="'/api/'+game.id+'/offline'">here</a> to download a ZIP file called
+                "{{game.id}}.zip". Extract the contents of this ZIP file (which should include a directory called
+                "logic") into the "src" directory of your project. This can be done by right-clicking on "src" in
+                IntelliJ and then selecting <i>Open In &rarr; Explorer</i> if you're on Windows, <i>Open In &rarr;
+                    Finder</i> if you're on Mac, and <i>Open In &rarr; Files</i> if you're on Linux.
+            </p>
+            <p>
+                As well as the "logic" folder, create two additional packages in the "src" directory named
+                "{{game.package1}}" and "{{game.package2}}". Do this by right-clicking on "src" in IntelliJ and
+                selecting <i>New &rarr; Package</i>, entering the package name, and pressing enter.
+            </p>
+            <p>
+                You can now put the code for two {{game.playerPlural}} into these respective packages. You can find this
+                code by
+                clicking <a [href]="'/play/'+game.id">here</a>, selecting the {{game.playerSingular}} whose code you
+                want to download,
+                and clicking the download icon.
+            </p>
+            <img src="/assets/offline/download.png" alt="Download code">
+            <p>This will download the code as a ZIP archive. Extract its contents into either of the two packages.</p>
+            <p>You can either choose another {{game.playerSingular}} to put in the other package, or you can click <a
+                    download [href]="'/api/'+game.id+'/offlineplayer'">here</a> to download a template
+                {{game.playerSingular}} which lets you {{game.offlineControls}}.
+            </p>
+            <p>
+                <b>IMPORTANT:</b> Make sure that in every Java file you add to the project, you add a line to the top
+                which says either
+                <span class="snippet">
+                    package {{game.package1}};
+                </span>
+                or
+                <span class="snippet">
+                    package {{game.package2}};
+                </span>
+                depending on which package you put it into.
+            </p>
+            <img [src]="'/assets/offline/intellij/'+game.id+'/project.png'" alt="The Project"
+                onerror="this.classList.add('none')">
+            <p>
+                Next you must set the command line arguments. In IntelliJ this can be done by clicking "Program" in the
+                top right, and then "Edit Configuration". In the "Build and run" section there is a long text box in
+                which you can enter command line parameters separated by spaces.
+            </p>
+            <p>
+                {{game.params}}
+            </p>
+            <img [src]="'/assets/offline/intellij/'+game.id+'/params.png'" alt="Command line parameters"
+                onerror="this.classList.add('none')">
+            <p>With these set, click "Apply", and then click the green triangle to build and run the project.</p>
+        </section>
+    </div>
+</div>
