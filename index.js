@@ -22,7 +22,7 @@ const forceHTTPS = (req, res, next) => {
 }
 
 app.enable('trust proxy');
-app.use(forceHTTPS);
+// app.use(forceHTTPS);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
