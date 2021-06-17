@@ -2,10 +2,11 @@
     padding: 0.5em;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex-direction: column;
     font-size: clamp(10px, 5vw, 1em);
     overflow: auto;
+    height: 100%;
 
     .instructions {
         width: clamp(45ch, 50%, 75ch);
