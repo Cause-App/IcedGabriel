@@ -5,6 +5,7 @@ $navbar-height: min(2em, 6vh);
 
     app-navbar {
         height: $navbar-height;
+        width: 100%;
     }
 
     .router {

@@ -13,16 +13,7 @@ require("dotenv").config();
 const port = process.env.PORT || 8000;
 const { db } = require("./common");
 
-const forceHTTPS = (req, res, next) => {
-    if (req.protocol === "https" || req.headers.host.split(":")[0] === "localhost") {
-        next();
-    } else {
-        res.redirect("https://" + req.headers.host + req.url);
-    }
-}
-
 app.enable('trust proxy');
-// app.use(forceHTTPS);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

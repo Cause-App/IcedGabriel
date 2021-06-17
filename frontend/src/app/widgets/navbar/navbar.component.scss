@@ -16,12 +16,13 @@
     }
 
     > img {
-        height: 60%;
+        height: 1.5em;
     }
 }
 
 .dropdown {
     position: relative;
+    white-space: nowrap;
 
     &:hover, &:focus {
         .content {
@@ -78,5 +79,11 @@
                 margin-left: 0.5em;
             }
         }
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .title {
+        display: none;
     }
 }
