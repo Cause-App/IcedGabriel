@@ -63,7 +63,7 @@ select {
 
 .ng-autocomplete {
     font-size: 0.8em;
-    width: max(300px, 80%)!important;
+    width: clamp(100px,  80%, 300px)!important;
 }
 
 .heading {
