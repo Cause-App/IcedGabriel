@@ -93,7 +93,7 @@ import logic.Card;
 public class EinPlayer implements EinPlayerInterface {
 
     @Override
-    public Card playCard(Card facingCard, Card[] hand) {
+    public Card playCard(Card facingCard, Card[] hand, int opponentHandSize) {
         /*
             Welcome to Ein!
 
@@ -198,10 +198,10 @@ public class EinPlayer implements EinPlayerInterface {
       ], offlineControls: "use the mouse to select which card to play",
       params: "You must provide 3 parameters. The first is the number of milliseconds each player can take to make its decision. If one of your players is using the mouse to make a selection, set this to be something very big like 200000000. The next parameter is the animation speed. You can mess around with this parameter to help with debugging your code, but a good default value is 3. The next parameter is the number of games to be played. Set this to something big like 100."
     },
-    { name: "Monopoly", id: "monopoly", available: false },
+    { name: "Game of Life (Murder Edition)", id: "gameoflife", available: false },
   ]
 
-  constructor(private router: Router) {
+  constructor() {
     for (const game of this.games) {
       this.gamesByID[game.id] = game;
     }

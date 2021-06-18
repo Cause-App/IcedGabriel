@@ -13,7 +13,7 @@ public class EinPlayer implements EinPlayerInterface {
 
 	private Card clickedCard = null;
 
-	public Card playCard(Card lastPlayedCard, Card[] hand) {
+	public Card playCard(Card lastPlayedCard, Card[] hand, int opponentHandSize) {
 
 		clickedCard = null;
 

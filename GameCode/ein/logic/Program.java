@@ -38,12 +38,15 @@ public class Program {
 					System.setErr(ps);
 				}
 				List<Card> hand;
+				List<Card> otherHand;
 				if (s1) {
 					hand = game.s1Hand;
+					otherHand = game.s2Hand;
 				} else {
 					hand = game.s2Hand;
+					otherHand = game.s1Hand;
 				}
-				Card d = player.playCard(game.lastPlayedCard, hand.toArray(new Card[hand.size()]));
+				Card d = player.playCard(game.lastPlayedCard, hand.toArray(new Card[hand.size()]), otherHand.size());
 				game.move = d;
 			} catch (Exception e) {
 				throw e;
