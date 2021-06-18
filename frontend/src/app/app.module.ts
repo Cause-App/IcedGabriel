@@ -31,6 +31,7 @@ import { SnakePreviewComponent } from './widgets/3d/snake-preview/snake-preview.
 import { GameOptionsComponent } from './games/generic/game-options/game-options.component';
 import { GamePlayerComponent } from './games/generic/game-player/game-player.component';
 import { OfflineComponent } from './pages/offline/offline.component';
+import { DonationNoticeComponent } from './widgets/donation-notice/donation-notice.component';
 
 const socketConfig: SocketIoConfig = { url: '/', options: {} };
 
@@ -75,7 +76,8 @@ export function storageFactory(): OAuthStorage {
     SnakePreviewComponent,
     GameOptionsComponent,
     GamePlayerComponent,
-    OfflineComponent
+    OfflineComponent,
+    DonationNoticeComponent
   ],
   imports: [
     BrowserModule,

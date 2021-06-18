@@ -5,6 +5,14 @@
     padding: 10px;
     font-size: clamp(10px, 5vw, 1em);
     overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+
+    app-donation-notice {
+        margin-top: auto;
+    }
 
     table {
         margin: 30px auto;

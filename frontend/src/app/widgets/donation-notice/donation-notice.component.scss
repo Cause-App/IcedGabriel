@@ -1,0 +1,35 @@
+:host {
+    font-size: clamp(20px, 1em, 5vw);
+    width: min(45ch, 90%);
+    text-align: center;
+}
+
+.content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    background-color: #00000090;
+    padding: 0.5em 2em;
+    > * {
+        margin: 0.5em 0;
+    }
+    border-radius: 2em;
+}
+
+a {
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.button {
+    background-color: black;
+    border: 1px solid white;
+    padding: 0.2em 0.7em;
+    transition: transform 0.2s ease;
+
+    &:hover {
+        transform: scale(1.1);
+    }
+}
