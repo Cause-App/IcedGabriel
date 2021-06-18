@@ -32,6 +32,7 @@ import { GameOptionsComponent } from './games/generic/game-options/game-options.
 import { GamePlayerComponent } from './games/generic/game-player/game-player.component';
 import { OfflineComponent } from './pages/offline/offline.component';
 import { DonationNoticeComponent } from './widgets/donation-notice/donation-notice.component';
+import { CopyrightBarComponent } from './widgets/copyright-bar/copyright-bar.component';
 
 const socketConfig: SocketIoConfig = { url: '/', options: {} };
 
@@ -77,7 +78,8 @@ export function storageFactory(): OAuthStorage {
     GameOptionsComponent,
     GamePlayerComponent,
     OfflineComponent,
-    DonationNoticeComponent
+    DonationNoticeComponent,
+    CopyrightBarComponent
   ],
   imports: [
     BrowserModule,

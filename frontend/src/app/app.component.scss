@@ -1,4 +1,5 @@
 $navbar-height: min(2em, 6vh);
+$copyright-height: 20px;
 
 .content {
     height: 100vh;
@@ -9,6 +10,6 @@ $navbar-height: min(2em, 6vh);
     }
 
     .router {
-        height: calc(100vh - #{$navbar-height});
+        height: calc(100vh - #{$navbar-height} - #{$copyright-height});
     }
 }
