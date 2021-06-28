@@ -11,6 +11,7 @@ const validFilename = require('valid-filename');
 const runCommand = (command) => {
     return new Promise((resolve, reject) => {
         exec(command, (err, stdout, stderr) => {
+            console.log({err, stdout, stderr});
             if (err) {
                 reject({ err, stdout, stderr });
             } else {
