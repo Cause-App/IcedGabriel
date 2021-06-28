@@ -5,7 +5,7 @@ const games = [
     createGame(
         "snake", // Game ID
         1024 * 1024 * 2, // Initial heap size 
-        1024 * 1024 * 64, // Max heap size
+        1024 * 1024 * 4, // Max heap size
         1024 * 512, // Thread stack size
         [
             {label: "grid_width", value: 16},
@@ -27,7 +27,7 @@ const games = [
     createGame(
         "ein", // Game ID
         1024 * 1024 * 2, // Initial heap size 
-        1024 * 1024 * 64, // Max heap size
+        1024 * 1024 * 4, // Max heap size
         1024 * 512, // Thread stack size
         [
             {label: "max_millis_per_move", value: 50},
