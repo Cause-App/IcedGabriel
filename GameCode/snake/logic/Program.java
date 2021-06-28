@@ -461,6 +461,10 @@ public class Program {
 		s1Out = "";
 
 		rounds = 0;
+
+		PrintStream systemOut = System.out;
+		PrintStream systemErr = System.err;
+
 		try {
 			wins = 0;
 			loses = 0;
@@ -479,7 +483,10 @@ public class Program {
 				System.out.print(""+wins+","+loses+","+draws);
 			}
 		} catch (Exception e) {
+			System.setOut(systemOut);
+			System.setErr(systemErr);
 			e.printStackTrace();
+			System.err.println("Something went bad");
 		} finally {
 			if (!graphical) {
 				System.exit(0);
