@@ -140,6 +140,7 @@ export class GamePlayerComponent implements OnInit {
           this.reference.instance.gameString = this.gameString;
         }
       } else {
+        console.error({response});
         this.queue = -1;
         this.warnings.setWarning("invalidGame", true);
       }
