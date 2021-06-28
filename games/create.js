@@ -261,7 +261,7 @@ const createGame = (
 
             }
 
-            await runCommand(`cd ${gamePath} && javac logic/Program.java`);
+            await runCommand(`cd ${gamePath} && unset JAVA_TOOL_OPTIONS && javac logic/Program.java`);
 
             const output = await runCommand(`unset JAVA_TOOL_OPTIONS && java -Djava.security.manager -Djava.security.policy==${policyPath} -Xms${initialHeapSize} -Xmx${maxHeapSize} -Xss${threadStackSize} -cp ${gamePath} logic.Program ${args.map(x => x.value).join(' ')} ${ranked ? numberOfRankedGames : -1}`);
             callback(output);
