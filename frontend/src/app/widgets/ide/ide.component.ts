@@ -23,7 +23,7 @@ const languageFromFilename = (filename: string): string => {
   return languageOfExtension[ext] ?? "text";
 }
 
-const allowedCharsInFilenames = "ABCDEFGHIJKLMNOPQSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&'()+,-;=@[]^_`{}~. ";
+const allowedCharsInFilenames = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&'()+,-;=@[]^_`{}~. ";
 const notAllowedAtEndOfFilename = ". ";
 const notAllowedAtStartOfFilename = " ";
 
