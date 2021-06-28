@@ -91,7 +91,7 @@ export class IdeComponent implements OnInit, AfterViewInit {
     const session = this.makeSession();
     this.editSessions.push(session);
     this.codeFiles.push({
-      filename: this.incrementDuplicateFilenames("New file.txt"),
+      filename: this.incrementDuplicateFilenames("NewFile.java"),
       code: ""
     })
     this.selectedSession = this.editSessions.length - 1;
