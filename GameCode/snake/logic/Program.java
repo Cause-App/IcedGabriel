@@ -290,6 +290,7 @@ public class Program {
 					game.s1Out += sw.toString();
 				}
 				f1.cancel(true);
+				game.s1Move = null;
 			}
 
 			if (!graphical && game.s1Out.length() > 0) {
@@ -301,6 +302,7 @@ public class Program {
 				f2.get(SNAKE_MOVE_MAX_MILLIS, TimeUnit.MILLISECONDS);
 			} catch (TimeoutException | InterruptedException | ExecutionException e) {
 				f2.cancel(true);
+				game.s2Move = null;
 			}
 
 			log+=","+dirToInt(game.s1Move)+","+dirToInt(game.s2Move);
