@@ -10,7 +10,7 @@ const games = [
         [
             {label: "grid_width", value: 16},
             {label: "grid_height", value: 16},
-            {label: "max_millis_per_move", value: 50},
+            {label: "max_millis_per_move", value: 500},
             {label: "max_rounds", value: 500},
             {label: "fps", value: 0}
         ], // Command line arguments to be passed to the Java program (not including nunber of games to be played)
@@ -30,7 +30,7 @@ const games = [
         1024 * 1024 * 4, // Max heap size
         1024 * 512, // Thread stack size
         [
-            {label: "max_millis_per_move", value: 50},
+            {label: "max_millis_per_move", value: 500},
             {label: "fps", value: 0}
         ], // Command line arguments to be passed to the Java program (not including nunber of games to be played)
         () => db.db.collection("ein"), // Player collection
