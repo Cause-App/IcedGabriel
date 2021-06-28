@@ -56,6 +56,8 @@ public class Program {
 				}
 
 			} catch (Exception e) {
+				System.setOut(stdout);
+				System.setErr(stderr);
 				throw e;
 			} finally {
 				System.setOut(stdout);
