@@ -257,6 +257,7 @@ public class Program {
 
 	private static void playOneGame() {
 		game = new Game();
+		rounds = 0;
 
 		if (window != null) {
 			window.setGrid(game.grid);
